@@ -1,0 +1,65 @@
+/* P5 跟上 · 纯黑 + 单点琥珀 + 颗粒加重（唯一的持续动画是颗粒） */
+.grain{position:fixed;inset:-50%;z-index:1;pointer-events:none;opacity:.05;animation:jit 6s steps(6) infinite;
+background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>")}
+.lite .grain{animation:none;display:none}
+@keyframes jit{0%{transform:translate3d(0,0,0)}20%{transform:translate3d(-3%,2%,0)}40%{transform:translate3d(2%,-3%,0)}60%{transform:translate3d(-2%,-1%,0)}80%{transform:translate3d(3%,3%,0)}100%{transform:translate3d(0,0,0)}}
+#dim{position:fixed;inset:0;z-index:40;background:#2A1C12;opacity:0;pointer-events:none;transition:opacity .4s linear}
+.sil{position:fixed;left:6vw;bottom:58px;z-index:3;display:flex;gap:16px;pointer-events:none}
+.sil i{position:relative;width:12px;height:30px;border:1px solid var(--dim);opacity:0;transition:opacity 1.2s ease-out}
+.sil i::before{content:"";position:absolute;left:1px;top:-12px;width:8px;height:8px;border:1px solid var(--dim)}
+.sil i.on{opacity:.55}
+#fl{position:fixed;left:0;right:0;top:36%;z-index:30;display:flex;justify-content:center;pointer-events:none}
+.nmf{position:absolute;font:900 28px var(--serif);letter-spacing:.2em;color:var(--accent);animation:nmf 2.2s linear both}
+@keyframes nmf{0%{opacity:0;transform:translateY(8px)}9%,64%{opacity:1;transform:none}100%{opacity:0;transform:none}}
+
+.p5{position:relative;z-index:2;max-width:640px;margin:0 auto;padding:16vh 6vw 26vh}
+#stage{transition:opacity .4s ease-out}#stage.off{opacity:0}
+#stage.fast *{animation-delay:0s!important;animation-duration:.01ms!important}
+#stage p{font-size:18px;line-height:2;opacity:0;animation:rise 1s var(--ease) var(--d,0s) both}
+#stage strong{font-weight:500;color:#12100D}
+#stage .sm{font-size:13px;line-height:1.8;color:var(--dim);margin-top:22px}
+.gap{display:block;height:1.1em}
+.m{margin-bottom:28px;font:300 13px var(--mono);letter-spacing:.06em;color:var(--dim);outline:0;opacity:0;animation:fadein 1.2s ease-out var(--d,0s) both}
+.m::before{content:"";display:inline-block;width:6px;height:6px;margin-right:12px;background:var(--accent)}
+.opts{margin-top:44px;opacity:0;animation:fadein 1s ease-out var(--d,0s) both}
+.opt{display:flex;gap:18px;width:100%;padding:16px 0 16px 4px;border:0;border-top:1px solid var(--line);background:none;color:var(--fg);
+font:300 17px/1.7 var(--sans);text-align:left;cursor:pointer;transition:color .25s,padding-left .35s var(--ease)}
+.opt b{flex:none;font:300 13px/2.3 var(--mono);color:var(--dim);transition:color .25s}
+.opt:hover,.opt:focus-visible{color:#12100D;padding-left:14px}.opt:hover b{color:var(--accent)}
+.opt.q{font-style:italic;color:var(--dim)}
+#stage p.res{padding-left:18px;border-left:1px solid var(--accent)}
+.nx{margin-top:40px;padding:8px 14px 8px 0;border:0;border-bottom:1px solid var(--line);background:none;color:var(--dim);font-size:20px;cursor:pointer;transition:color .2s,border-color .2s;animation:fadein 1s ease-out .8s both}
+.nx:hover{color:var(--accent);border-color:var(--accent)}
+#nm{width:7em;padding:6px 0;border:0;border-bottom:1px solid var(--line);background:none;color:var(--fg);font:900 30px var(--serif);outline:0;opacity:0;animation:fadein 1s ease-out var(--d) both}
+#nm:focus{border-color:var(--accent)}
+.roles{display:flex;gap:16px;margin-top:40px;opacity:0;animation:fadein 1s ease-out var(--d) both}
+.roles .btn{background:none;color:inherit;cursor:pointer}
+.fin{margin-top:52px;opacity:0;animation:fadein 1.4s ease-out var(--d,0s) both}
+.card{padding:28px;border:1px solid var(--line)}
+.card h3{font:900 24px var(--serif);letter-spacing:.08em}
+.card dt{margin-top:18px;font:900 17px var(--serif)}
+.card dd{font-size:14px;color:var(--dim)}
+.card p{margin-top:24px;font-size:15px;line-height:1.9}
+.card .sm{font-size:13px;color:var(--dim)}
+.lg{margin-top:18px;font-size:13px;color:var(--dim)}
+.lg summary{cursor:pointer}.lg ol{display:flex;flex-wrap:wrap;gap:6px 18px;margin-top:10px;list-style:none}
+.fin .btn{margin-top:28px;background:none;color:inherit;cursor:pointer}
+/* 结局后的史实补刀 */
+.xzfx{margin-top:46px;padding:2px 0 2px 20px;border-left:1px solid rgba(192,57,43,.5);animation:fadein 1.2s ease-out .4s both}
+.xzfx__h{margin-bottom:14px;font:300 10px var(--mono);letter-spacing:.26em;color:#C0392B}
+.xzfx__a{font-size:14px;line-height:1.95;color:rgba(27,24,20,.82)}
+.xzfx small{display:block;margin:6px 0 16px;font:300 10px var(--mono);color:rgba(27,24,20,.45)}
+.xzfx small:last-child{margin-bottom:0}
+@media (max-width:640px){.sil{gap:10px}.card{padding:20px}}
+
+/* 身份选择 */
+.pick{margin-top:36px;font-size:13px;letter-spacing:.08em;color:var(--dim);opacity:0;animation:fadein 1s ease-out var(--d,0s) both}
+.roles.two{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:18px}
+.role{display:block;width:100%;padding:22px 20px;border:1px solid var(--line);background:none;color:var(--fg);
+text-align:left;cursor:pointer;transition:border-color .25s,background .25s}
+.role b{display:block;font:900 24px/1.3 var(--serif);letter-spacing:.1em}
+.role em{display:block;margin-top:10px;font:300 13px/1.85 var(--sans);font-style:normal;color:var(--dim)}
+.role:hover,.role:focus-visible{border-color:var(--accent)}
+.role:hover b,.role:focus-visible b{color:var(--accent)}
+.roleend{margin-top:22px;color:var(--accent) !important}
+@media (max-width:640px){.roles.two{grid-template-columns:1fr}}

@@ -1,0 +1,57 @@
+/* 同行 · 分流页 / 活动页公共 / 活动 A */
+.nav{background:linear-gradient(var(--bg) calc(100% - 6px),transparent)}
+.pager{background:linear-gradient(transparent,var(--bg) 6px)}
+
+/* 分流主页 */
+.hero{min-height:56dvh;display:flex;flex-direction:column;justify-content:flex-end;padding:0 7vw 8vh}
+.hero h1{font:900 clamp(44px,6.5vw,72px)/1.2 var(--serif);letter-spacing:.08em}
+.hero h1::after{content:"";display:block;width:120px;height:1px;margin-top:22px;background:var(--accent);transform-origin:left;animation:draw 1.4s var(--ease) 1s both}
+.hero .sub{margin-top:22px;font-size:14px;letter-spacing:.1em;color:var(--dim)}
+.rows{max-width:1100px;margin:0 auto;padding:0 7vw 4vh}
+.row{position:relative;display:grid;grid-template-columns:110px minmax(0,1fr) auto;gap:2vw 4vw;align-items:center;padding:46px 0 46px 28px;
+border-top:1px solid var(--line);text-decoration:none;color:inherit;overflow:hidden}
+.row:last-child{border-bottom:1px solid var(--line)}
+.row::before{content:"";position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--accent);transform:scaleY(0);transform-origin:top;transition:transform .5s var(--ease)}
+.row::after{content:"";position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .4s;
+background:radial-gradient(340px circle at var(--mx,50%) var(--my,50%),rgba(192,57,43,.07),transparent 70%)}
+.row:hover::before,.row:focus-visible::before{transform:none}
+.row:hover::after{opacity:1}
+.row__k{font:300 12px var(--mono);letter-spacing:.26em;color:var(--accent)}
+.row__b b{display:block;font:900 clamp(30px,4.6vw,56px)/1.15 var(--serif);letter-spacing:.06em;transition:transform .5s var(--ease)}
+.row__b em{display:block;max-width:30em;margin-top:12px;font:300 15px/1.8 var(--sans);font-style:normal;color:var(--dim)}
+.row__m{display:flex;align-items:center;gap:18px;font:300 12px var(--mono);letter-spacing:.08em;color:var(--dim);white-space:nowrap}
+.row__m i{font-style:normal;font-size:22px;color:var(--fg);transition:transform .5s var(--ease),color .3s}
+.row:hover .row__b b{transform:translateX(10px)}
+.row:hover .row__m i{transform:translateX(8px);color:var(--accent)}
+.js .row{opacity:0;transform:translateY(18px);transition:opacity .9s ease-out calc(var(--i)*.12s),transform .9s var(--ease) calc(var(--i)*.12s)}
+.js .row.in{opacity:1;transform:none}
+@media (max-width:760px){.row{grid-template-columns:1fr;padding:34px 0 34px 20px}.row__m{justify-content:space-between}}
+
+/* 活动页公共 */
+.back{display:inline-block;margin-bottom:34px;font:300 12px var(--mono);letter-spacing:.14em;color:var(--dim);text-decoration:none;transition:color .2s,transform .3s var(--ease)}
+.back:hover{color:var(--accent);transform:translateX(-4px)}
+.act{position:relative;z-index:2;max-width:760px;margin:0 auto;padding:15vh 7vw 18vh}
+.act .cap{margin-bottom:16px;font:300 10px var(--mono);letter-spacing:.28em;color:var(--accent);animation:fadein 1s ease-out .2s both}
+.act h1{font:900 clamp(40px,6vw,64px)/1.2 var(--serif);letter-spacing:.08em;animation:rise 1s var(--ease) .3s both}
+.act h1::after{content:"";display:block;width:96px;height:1px;margin-top:20px;background:var(--accent);transform-origin:left;animation:draw 1.2s var(--ease) 1s both}
+.act .lead{margin:22px 0 46px;font:500 clamp(16px,1.8vw,19px)/1.9 var(--serif);color:var(--dim);animation:rise 1s var(--ease) .5s both}
+.qact{display:flex;gap:14px;flex-wrap:wrap;margin-top:34px}
+.qact .btn{background:none;color:inherit;cursor:pointer;font-family:inherit}
+
+/* 活动 A：八个数 */
+.act .quiz{padding:0;margin:0;border:0}
+.qbar{position:relative;height:1px;margin-bottom:30px;background:var(--line)}
+.qbar i{position:absolute;inset:0;background:var(--accent);transform:scaleX(0);transform-origin:left;transition:transform .7s var(--ease)}
+.q__n,.q__t{animation:rise .7s var(--ease) both}
+.qopt{animation:rise .6s var(--ease) calc(.12s + var(--k,0)*.07s) both}
+.qopt b{flex:none;font:300 10px var(--mono);letter-spacing:.16em;color:var(--dim)}
+.qopt.ok{border-color:#3F6B45;color:#3F6B45;animation:pop .45s var(--ease) both}
+.qopt.ok b{color:#3F6B45}
+.qopt.no{border-color:#C0392B;color:rgba(192,57,43,.85);animation:shake .38s both}
+.qopt.no b{color:rgba(192,57,43,.85)}
+@keyframes pop{0%{transform:scale(.985)}60%{transform:scale(1.012)}100%{transform:none}}
+@keyframes shake{20%{transform:translateX(-5px)}50%{transform:translateX(5px)}80%{transform:translateX(-3px)}100%{transform:none}}
+.qn{font:900 1.35em var(--serif);color:var(--accent);font-variant-numeric:tabular-nums}
+
+/* 大厅提示 */
+.hint{max-width:760px;margin:0 auto;padding:0 7vw 14vh;font-size:12px;line-height:1.9;color:var(--dim);letter-spacing:.02em}

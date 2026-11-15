@@ -1,0 +1,185 @@
+@import url("./navigation.css");
+/* 夜行 · 共享样式：主题变量 / 转场 / 导航 / 火柴 / G1 */
+:root{--bg:#F6F1E7;--fg:#1B1814;--dim:#6F6659;--accent:#C0392B;--accent2:#B4751F;--line:rgba(27,24,20,.16);
+--serif:"Noto Serif SC","Source Han Serif SC","Songti SC",STSong,SimSun,serif;
+--sans:"Noto Sans SC","Source Han Sans SC","PingFang SC","Microsoft YaHei",sans-serif;
+--mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;--ease:cubic-bezier(.2,.8,.2,1)}
+html[data-theme=p1]{--bg:#F3EDE1}
+html[data-theme=p2]{--bg:#F7F3EA;--accent:#B23A2E;--line:rgba(27,24,20,.13)}
+html[data-theme=p3]{--bg:#EFE7D8;--accent:#A9782F}
+html[data-theme=p4]{--bg:#F5F1E9}
+html[data-theme=p5]{--bg:#F2ECE0}
+html[data-theme=p6]{--bg:#F8EFE8;--accent:#B23A2E}
+html[data-theme=p7]{--bg:#F7F2E9;--accent:#A9782F;--line:rgba(27,24,20,.13)}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{background:var(--bg);color:var(--fg)}
+body{min-height:100dvh;font:300 16px/1.9 var(--sans);-webkit-font-smoothing:antialiased}
+a{color:inherit}button{font:inherit}
+:focus-visible{outline:1px solid var(--accent);outline-offset:4px}
+.skip-link{position:absolute;left:-999px}
+.skip-link:focus{left:12px;top:12px;z-index:100;background:var(--bg);padding:8px 12px}
+.solo{position:relative;height:100dvh;overflow:hidden}
+.close{position:relative;height:100dvh;overflow:hidden}
+
+/* 转场：黑场淡入 400ms + 光扫；离开 200ms */
+body::before,body::after{content:"";position:fixed;pointer-events:none}
+body::before{inset:0;z-index:90;background:var(--bg);transition:opacity .4s ease-out}
+html.on body::before{opacity:0}
+html.leave body::before{opacity:1;transition-duration:.2s}
+body::after{top:0;bottom:0;left:0;width:40vw;z-index:91;mix-blend-mode:screen;transform:translateX(-120%);
+background:linear-gradient(100deg,transparent,rgba(192,57,43,.09) 70%,rgba(192,57,43,.09) 96%,transparent)}
+html.on body::after{animation:sweep .7s cubic-bezier(.3,.6,.3,1) .1s both}
+@keyframes sweep{to{transform:translateX(280%)}}
+
+/* 导航与页码 */
+.nav{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;padding:max(13px,env(safe-area-inset-top)) 4vw 13px;
+font-size:16px;line-height:1;overflow-x:auto;scrollbar-width:none}
+.nav a,.nav .xz{flex:none;padding:10px 15px;color:var(--dim);text-decoration:none;border-bottom:1px solid transparent;transition:color .3s,border-color .3s;letter-spacing:.02em}
+.nav a:hover,.nav a[aria-current]{color:var(--fg);border-color:var(--accent)}
+.nav .xz{margin-left:auto;color:var(--accent);opacity:.85}
+html.nav-on .nav .xz{opacity:1;transition:opacity 1.6s ease-out .6s}
+.pager{position:fixed;left:0;right:0;bottom:0;z-index:50;display:flex;justify-content:space-between;align-items:center;
+padding:13px 4vw max(15px,env(safe-area-inset-bottom));font-size:14px;line-height:1;color:var(--dim)}
+.pager a{padding:8px 0;text-decoration:none;transition:color .3s}.pager a:hover{color:var(--fg)}
+.pager .num{font:300 14px var(--mono);font-variant-numeric:tabular-nums}
+
+/* 页脚：普通页在文末，整屏页固定成一行 */
+.foot{margin-top:12vh;padding:44px 7vw 108px;border-top:1px solid var(--line);color:var(--dim)}
+.foot__in{display:flex;flex-wrap:wrap;gap:16px 5vw;justify-content:space-between;align-items:flex-start;max-width:1180px;margin:0 auto}
+.foot__t{flex:0 0 auto;font:500 15px/1.7 var(--serif);letter-spacing:.06em;color:var(--fg)}
+.foot__t em{display:block;margin-top:5px;font:300 11px/1.6 var(--sans);font-style:normal;letter-spacing:.02em;color:var(--dim)}
+.foot__k{flex:0 0 auto;font:300 11px/1.9 var(--sans);color:var(--dim);letter-spacing:.02em}
+.foot__addr{text-align:right;line-height:1.75;color:var(--fg);opacity:.85}
+.foot__addr em{display:block;font-style:normal;font:300 11px/1.75 var(--sans);color:var(--dim)}
+body.solo .foot,body.rail-page .foot{position:fixed;left:0;right:0;bottom:58px;z-index:44;margin:0;padding:0 4vw;border:0;pointer-events:none;opacity:.85}
+body.solo .foot__in,body.rail-page .foot__in{justify-content:center;gap:0 4vw;max-width:none}
+body.solo .foot__t,body.rail-page .foot__t{font-size:11px;color:var(--dim)}
+body.solo .foot__k,body.rail-page .foot__k{font-size:10px;display:none}
+body.solo .foot__k:nth-of-type(2),body.rail-page .foot__k:nth-of-type(2){display:block}
+body[data-late] .foot{opacity:0;transition:opacity .9s ease-out}
+html.nav-on body[data-late] .foot{opacity:.85}
+body[data-late]{touch-action:none}
+body[data-late] .nav,body[data-late] .pager{opacity:0;pointer-events:none;transition:opacity .9s ease-out}
+html.nav-on body{touch-action:auto;cursor:auto}
+html.nav-on body[data-late] .nav,html.nav-on body[data-late] .pager,
+body[data-late] .nav:focus-within,body[data-late] .pager:focus-within{opacity:1;pointer-events:auto}
+html.live body{cursor:none}html.nav-on body{cursor:auto}
+
+/* 序章文字：逐行浮现 */
+.intro{position:absolute;z-index:3;left:8vw;top:max(14vh,72px);pointer-events:none}
+.intro p{opacity:0;animation:rise 1.2s var(--ease) var(--d) both}
+.t1,.t2{font:900 clamp(32px,4.6vw,48px)/1.25 var(--serif);letter-spacing:.04em}
+.t1{--d:1.5s}.t2{--d:2.1s}
+.t2::after{content:"";display:block;width:96px;height:1px;margin-top:18px;background:var(--accent);transform-origin:left;animation:draw 1.2s var(--ease) 2.7s both}
+.t3{--d:3.3s;margin-top:14px;font-size:15px;letter-spacing:.14em;color:var(--dim)}
+@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes draw{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes fadein{from{opacity:0}to{opacity:1}}
+
+/* 火柴：唯一的持续动画是火光呼吸 */
+.match{position:absolute;z-index:2;left:50%;top:var(--my,56%);width:120px;height:200px;margin-left:-60px;border:0;background:none;color:inherit;
+opacity:0;animation:fadein 1.6s ease-out var(--md,3.4s) both}
+.match:not([disabled]){cursor:pointer}
+.glow{position:absolute;left:50%;top:4px;width:360px;height:360px;margin:-180px 0 0 -180px;pointer-events:none;
+background:radial-gradient(circle,rgba(200,102,42,.26),rgba(200,102,42,.09) 36%,transparent 62%);animation:flick 4s ease-in-out infinite}
+.lite .glow{animation:none}
+@keyframes flick{0%,100%{transform:scale(1);opacity:.9}18%{transform:scale(1.05);opacity:1}34%{transform:scale(.97);opacity:.82}52%{transform:scale(1.08);opacity:.95}71%{transform:scale(1.01);opacity:.86}}
+.head{position:absolute;left:50%;top:0;width:7px;height:9px;margin-left:-3px;background:#3a2c1f;transition:background .6s,transform .3s}
+.stick{position:absolute;left:50%;top:9px;width:3px;height:130px;margin-left:-1px;background:linear-gradient(#6a5338,#2a241e);
+transform:scaleY(0);transform-origin:top;transition:transform 1.2s var(--ease)}
+.armed .head{background:var(--accent)}.armed .stick{transform:none}
+.match:not([disabled]):hover .head{transform:scale(1.5)}
+
+/* G1 夜行：光标之光 / 节点 / 路线 */
+.stage{position:fixed;inset:0;overflow:hidden}
+.route{position:fixed;inset:0;width:100%;height:100%;pointer-events:none}
+.route path{fill:none;stroke:var(--accent);stroke-width:2.2;stroke-linecap:round;stroke-dasharray:1;stroke-dashoffset:1;transition:stroke-dashoffset .9s cubic-bezier(.4,0,.2,1);filter:drop-shadow(0 0 4px rgba(216,87,60,.3))}
+.route path.on{stroke-dashoffset:0}
+.route .pulse{stroke:#D8573C;stroke-width:3.2;stroke-dasharray:.07 1;stroke-dashoffset:.07;opacity:0}
+.done .pulse{animation:run 1.9s cubic-bezier(.5,0,.25,1) 1s both}
+@keyframes run{0%{opacity:1;stroke-dashoffset:.07}92%{opacity:1}100%{opacity:0;stroke-dashoffset:-1}}
+.route.echo{opacity:.28}
+.close .route{position:absolute}
+.light{position:absolute;left:-340px;top:-340px;width:680px;height:680px;pointer-events:none;opacity:0;transition:opacity 1.4s;will-change:transform;
+background:radial-gradient(circle,rgba(255,236,200,.55),rgba(200,102,42,.14) 15%,rgba(200,102,42,.05) 42%,transparent 68%)}
+html.live .light{opacity:1}
+.n{position:absolute;pointer-events:none}
+.n i{position:absolute;left:-4px;top:-4px;width:8px;height:8px;border-radius:50%;background:var(--accent);
+opacity:.18;transform:scale(.7);transition:opacity .9s ease-out,transform 1s var(--ease),box-shadow 1s ease-out}
+.n.on i{opacity:1;transform:scale(1);box-shadow:0 0 12px 3px rgba(216,87,60,.4);animation:flick 3.4s ease-in-out infinite}
+.n i::after{content:"";position:absolute;left:50%;top:50%;width:72px;height:72px;margin:-36px 0 0 -36px;border-radius:50%;
+background:radial-gradient(circle,rgba(216,87,60,.3),rgba(216,87,60,0) 68%);opacity:0;transform:scale(.45);
+transition:opacity 1.2s ease-out,transform 1.8s var(--ease)}
+.n.on i::after{opacity:1;transform:scale(1)}
+.n em,.n b{position:absolute;left:0;white-space:nowrap;opacity:0;transform:translate(-50%,10px);
+transition:transform .9s var(--ease) .2s,opacity .9s ease-out .2s;text-shadow:0 0 7px var(--bg),0 0 3px var(--bg)}
+.n.on em,.n.on b{opacity:1;transform:translate(-50%,0)}
+.n b{top:-36px;font-family:"STKaiti","楷体","KaiTi",var(--serif);font-weight:400;font-size:clamp(18px,1.9vw,24px);letter-spacing:.09em;line-height:1}
+.n em{top:-55px;font:600 11px/1 var(--mono);font-style:normal;letter-spacing:.14em;color:var(--accent)}
+
+/* 点火：600ms 光斑扩散 */
+.bloom{position:fixed;z-index:95;width:120px;height:120px;margin:-60px 0 0 -60px;pointer-events:none;
+background:radial-gradient(circle,#F6C79A,#C8662A 22%,rgba(200,102,42,.45) 44%,transparent 68%);animation:bloom .6s cubic-bezier(.5,0,.2,1) both}
+@keyframes bloom{from{transform:scale(.15);opacity:1}75%{opacity:1}to{transform:scale(36);opacity:0}}
+
+/* P8 */
+.outro{position:absolute;z-index:3;left:0;right:0;top:calc(var(--my,26%) + 200px);text-align:center}
+.outro .t{font:900 40px/1.4 var(--serif);letter-spacing:.1em;animation:rise 1.4s var(--ease) 2.4s both}
+.acts{display:flex;gap:24px;justify-content:center;margin-top:36px;animation:rise 1.2s var(--ease) 3.4s both}
+.btn{padding:12px 24px;border:1px solid var(--line);font-size:14px;line-height:1;text-decoration:none;transition:border-color .2s,color .2s}
+.btn:hover{border-color:var(--accent);color:var(--accent)}
+
+@media (max-width:640px){.nav{font-size:14px}.intro{left:7vw}.t3{font-size:14px}.acts{gap:14px}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-delay:0s!important;
+animation-iteration-count:1!important;transition-duration:.01ms!important;transition-delay:0s!important}}
+
+/* ---------- 留言 / 答题（同行页与天亮页共用） ---------- */
+.leave,.quiz{padding:10vh 7vw 6vh;border-top:1px solid var(--line)}
+.leave .cap,.quiz .cap{margin-bottom:18px;font:300 10px var(--mono);letter-spacing:.28em;color:var(--dim)}
+.leave .lead{max-width:30em;margin-bottom:32px;font:500 clamp(17px,2vw,21px)/1.8 var(--serif)}
+.leave form{display:flex;gap:20px;align-items:center;max-width:640px;padding-bottom:14px;border-bottom:1px solid var(--fg)}
+.leave input{flex:1;padding:8px 0;border:0;background:none;outline:none;font:300 18px var(--sans);color:var(--fg)}
+.leave input::placeholder{color:#BFB4A1}
+.leave form .btn{flex:none;border:0;padding:6px 0 6px 20px;background:none;font-size:14px;letter-spacing:.12em;color:var(--accent)}
+.leave form .btn:hover{color:var(--fg)}
+.mcard{margin-top:38px;max-width:460px;padding:30px 32px;border:1px solid var(--line);background:rgba(255,255,255,.34)}
+.mcard__t{font:500 clamp(18px,2vw,22px)/1.8 var(--serif);min-height:1.8em}
+.mcard__f{margin-top:22px;font:300 10px var(--mono);letter-spacing:.22em;color:var(--dim)}
+.msgs{list-style:none;max-width:640px;margin-top:40px}
+.msgs li{display:flex;gap:18px;padding:16px 0;border-top:1px solid var(--line);font-size:15px;line-height:1.8}
+.msgs li span{flex:none;padding-top:3px;font:300 11px var(--mono);color:var(--dim)}
+.msgs:empty{display:none}
+
+.quiz[hidden]{display:none}
+.quiz .lead{max-width:30em;margin-bottom:30px;font:500 clamp(17px,2vw,21px)/1.8 var(--serif)}
+.p5 .quiz{padding:9vh 0 0;margin-top:9vh}
+#q{max-width:760px}
+.q__n{margin-bottom:14px;font:300 10px var(--mono);letter-spacing:.26em;color:var(--dim)}
+.q__t{font:500 clamp(19px,2.2vw,25px)/1.75 var(--serif)}
+.qopts{display:grid;gap:10px;margin-top:30px}
+.qopt{display:flex;gap:16px;align-items:center;padding:17px 20px;border:1px solid var(--line);background:none;
+font:300 15px var(--sans);color:var(--fg);text-align:left;cursor:pointer;transition:border-color .2s,color .2s}
+.qopt:hover:not([disabled]){border-color:var(--accent);color:var(--accent)}
+.opt b{flex:none;font:300 10px var(--mono);letter-spacing:.16em;color:var(--dim)}
+.opt.ok{border-color:#3F6B45;color:#3F6B45}.opt.ok b{color:#3F6B45}
+.opt.no{border-color:#C0392B;color:rgba(192,57,43,.8)}.opt.no b{color:rgba(192,57,43,.8)}
+.qopt[disabled]{cursor:default}
+.qres{margin-top:26px;font-size:14px;color:var(--dim);line-height:1.9}
+
+/* 序章：火星与燎原 */
+.light.on{opacity:1}
+.light.off{opacity:0;transition:opacity 1.2s ease-out}
+.ember{position:absolute;z-index:4;width:3px;height:3px;border-radius:50%;background:#E2763F;pointer-events:none;
+animation:emberUp var(--d,1.4s) ease-out var(--dl,0s) both}
+@keyframes emberUp{0%{opacity:.95;transform:translate(0,0) scale(1)}70%{opacity:.5}100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(.3)}}
+.flare{position:absolute;z-index:4;width:16px;height:16px;margin:-8px 0 0 -8px;border-radius:50%;pointer-events:none;
+background:radial-gradient(circle,#FFEFD2,#E2763F 38%,rgba(192,57,43,0) 70%);animation:flare 2.2s ease-out both}
+@keyframes flare{0%{opacity:0;transform:scale(.4)}16%{opacity:1}100%{opacity:0;transform:scale(17)}}
+.n.on i{box-shadow:0 0 10px 2px rgba(216,87,60,.55);animation:flick 2.4s ease-in-out infinite}
+
+/* 序章节点标签：窄屏收小，避免贴边 */
+@media (max-width:760px){
+  .n b{font-size:15px;top:-30px;letter-spacing:.06em}
+  .n em{font-size:9px;top:-46px;letter-spacing:.1em}
+}

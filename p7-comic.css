@@ -1,0 +1,425 @@
+/* P7 分镜 · 动态漫画 2.0：全屏吸附翻页 + 镜头推拉 + 无缝长卷
+   每格 = 100dvh 场景，上下相接无空白；入场后镜头缓推/拉远/横移（Ken Burns）
+   IO 加 .seen 触发运镜与文字层；scroll-snap 负责翻页感 */
+.p7{--ink:#1B1814;--red:#C0392B;--gold:#A9782F;--paper:#F7F2E9;--night:#211C16;--ease2:cubic-bezier(.2,1.5,.4,1)}
+
+/* ---------- 长卷：去掉吸附，连续滑行 ---------- */
+html[data-theme=p7]{scroll-snap-type:none}
+
+/* ---------- 格：全屏、无缝、溢出裁切 ---------- */
+.p7 .shot{position:relative;height:100dvh;overflow:hidden;background:var(--night);isolation:isolate}
+.p7 .scene{position:absolute;inset:-5%;z-index:2;will-change:transform;transform:scale(var(--z,1.12))}
+.p7 .scene svg{display:block;width:100%;height:100%}
+.p7 .hud{position:absolute;inset:0;z-index:5;pointer-events:none}
+.p7 .hud>*{pointer-events:auto}
+
+/* 运镜：推 / 拉 / 横移。进场播一次，停在电影感终态 */
+.js .p7 .shot .scene{transform:scale(var(--z,1.12))}
+.js .p7 .shot.seen .scene{animation:dolly 5.2s cubic-bezier(.16,.55,.25,1) both}
+@keyframes dolly{from{transform:scale(1.3)}to{transform:scale(1.05)}}
+.js .p7 .shot[data-move=out].seen .scene{animation-name:dollyout}
+@keyframes dollyout{from{transform:scale(1.12)}to{transform:scale(.99)}}
+.js .p7 .shot[data-move=pan].seen .scene{animation-name:pan}
+@keyframes pan{from{transform:translateX(-3.5%) scale(1.14)}to{transform:translateX(3.5%) scale(1.14)}}
+.js .p7 .shot[data-move=push].seen .scene{animation-name:push;animation-duration:4s}
+@keyframes push{from{transform:scale(.96)}to{transform:scale(1.14)}}
+
+/* 震动 + 白闪：高潮格专用 */
+.js .p7 .shot--quake.seen{animation:quake .6s ease-out .7s}
+@keyframes quake{0%,100%{transform:none}20%{transform:translate(-7px,3px)}40%{transform:translate(6px,-4px)}60%{transform:translate(-4px,2px)}80%{transform:translate(3px,-1px)}}
+.p7 .flash{position:absolute;inset:0;z-index:9;background:#FFE9C4;opacity:0;pointer-events:none}
+.js .p7 .shot.seen .flash{animation:flash .7s ease-out .6s both}
+@keyframes flash{0%{opacity:0}18%{opacity:.85}100%{opacity:0}}
+
+/* ---------- 封面 ---------- */
+.p7 .shot--cover{background:var(--paper)}
+.p7 .cover{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;padding:0 8vw;z-index:5}
+.p7 .cover .cap{font:300 10px var(--mono);letter-spacing:.3em;color:var(--red)}
+.p7 .cover h1{font:900 clamp(56px,9.5vw,120px)/1.15 var(--serif);letter-spacing:.06em;
+opacity:0;animation:coverin 1.5s var(--ease) .4s both}
+@keyframes coverin{from{opacity:0;transform:scale(1.24);filter:blur(6px)}to{opacity:1;transform:scale(1);filter:blur(0)}}
+.p7 .cover h1::after{content:"";display:block;width:140px;height:2px;margin-top:26px;background:var(--red);transform-origin:left;animation:draw 1.2s var(--ease) 1.4s both}
+.p7 .cover .sub{margin-top:24px;font-size:15px;letter-spacing:.12em;color:var(--dim);animation:fadein 1.2s ease-out 1.6s both}
+.p7 .cover .roll{display:inline-flex;align-items:center;gap:12px;margin-top:52px;font:300 12px var(--mono);letter-spacing:.24em;color:var(--dim)}
+.p7 .cover .roll i{display:block;width:1px;height:36px;background:var(--ink);opacity:.5;animation:drop 1.6s ease-in-out infinite}
+@keyframes drop{0%{transform:scaleY(0);transform-origin:top}45%{transform:scaleY(1);transform-origin:top}55%{transform:scaleY(1);transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+.p7 .cover-art{position:absolute;inset:0;z-index:0;pointer-events:none;opacity:.55;
+background:repeating-conic-gradient(from 168deg at 82% 30%,rgba(27,24,20,.05) 0 1deg,transparent 1deg 6deg)}
+
+/* 封面：淡墨画格 + 朱印，暗示“漫画” */
+.p7 .cover-motif{position:absolute;inset:0;z-index:0;pointer-events:none}
+.p7 .cover-motif .cm{position:absolute;display:block;border:1.5px solid rgba(27,24,20,.16)}
+.p7 .cover-motif .p-a{right:6vw;top:16vh;width:20vw;height:26vh;transform:rotate(-2.4deg)}
+.p7 .cover-motif .p-b{right:24vw;top:34vh;width:14vw;height:20vh;transform:rotate(1.6deg);opacity:.7;
+background:radial-gradient(circle,rgba(27,24,20,.16) 1px,transparent 1.4px) 0 0/7px 7px}
+.p7 .cover-motif .p-c{right:9vw;top:50vh;width:16vw;height:15vh;transform:rotate(1deg);
+background:repeating-linear-gradient(112deg,rgba(27,24,20,.10) 0 1px,transparent 1px 5px)}
+.p7 .cover-motif .p-d{right:28vw;top:10vh;width:9vw;height:13vh;transform:rotate(-1.2deg)}
+.p7 .cover-motif .cm-seal{position:absolute;right:7vw;top:17vh;padding:9px 7px;border:2px solid var(--red);
+color:var(--red);font:500 10px/1.7 var(--serif);letter-spacing:.08em;text-align:center;
+writing-mode:vertical-rl;opacity:.7;transform:rotate(1.5deg)}
+@media (max-width:760px){
+  .p7 .cover-motif .cm{opacity:.5}
+  .p7 .cover-motif .p-a{right:4vw;top:8vh;width:26vw;height:14vh}
+  .p7 .cover-motif .p-b{right:44vw;top:12vh;width:20vw;height:10vh}
+  .p7 .cover-motif .p-c,.p7 .cover-motif .p-d{display:none}
+  .p7 .cover-motif .cm-seal{right:5vw;top:7vh;font-size:9px}
+}
+
+/* ---------- 文字层公共：tag / 旁白 / 对话 / 印章 ---------- */
+.p7 .tag{position:absolute;top:76px;left:5vw;padding:6px 12px;background:var(--ink);color:var(--paper);
+font:300 10px var(--mono);letter-spacing:.2em;z-index:6}
+.p7 .tag b{color:#E8A468;font-weight:500;margin-right:6px}
+.p7 .nbx{max-width:480px;padding:14px 18px 13px;background:rgba(255,255,255,.9);border:2px solid var(--ink);
+font-size:14px;line-height:1.9;color:rgba(27,24,20,.94);backdrop-filter:blur(6px)}
+.p7 .nbx::before{content:attr(data-k);display:block;margin-bottom:6px;font:300 9px var(--mono);letter-spacing:.3em;color:var(--red)}
+.p7 .nbx small{display:block;margin-top:8px;font:300 10px var(--mono);letter-spacing:.06em;color:rgba(27,24,20,.42)}
+.p7 .bub{position:relative;max-width:280px;padding:11px 16px;background:#fff;border:2px solid var(--ink);font:500 14px/1.8 var(--serif)}
+.p7 .bub::after{content:"";position:absolute;left:26px;bottom:-11px;width:16px;height:16px;background:#fff;
+border-right:2px solid var(--ink);border-bottom:2px solid var(--ink);transform:rotate(55deg) skewX(20deg)}
+.p7 .bub em{display:block;margin-bottom:4px;font:300 9px var(--mono);font-style:normal;letter-spacing:.26em;color:var(--gold)}
+.p7 .bub--foe em{color:var(--red)}
+.p7 .stamp{display:inline-flex;flex-direction:column;align-items:center;gap:2px;padding:10px 14px;border:2px solid var(--red);
+color:var(--red);font:900 16px/1.25 var(--serif);letter-spacing:.1em;transform:rotate(3deg);background:rgba(247,242,233,.88)}
+
+/* 文字层入场：从各自方位浮现 */
+.js .p7 .hud .nbx,.js .p7 .hud .bub,.js .p7 .hud .stamp,.js .p7 .hud .plates,.js .p7 .hud .endline{opacity:0;transform:translateY(22px)}
+.js .p7 .shot.seen .hud .nbx,.js .p7 .shot.seen .hud .bub,.js .p7 .shot.seen .hud .stamp,
+.js .p7 .shot.seen .hud .plates,.js .p7 .shot.seen .hud .endline{opacity:1;transform:none;
+transition:opacity .6s ease-out .9s,transform .8s var(--ease) .9s}
+.js .p7 .shot.seen .hud .bub{transition-timing-function:ease-out,var(--ease2)}
+.js .p7 .shot.seen .hud .bub.b2{transition-delay:1.25s}
+.js .p7 .shot.seen .hud .bub.b3{transition-delay:1.6s}
+.js .p7 .shot.seen .hud .stamp{transition-delay:1.2s}
+.js .p7 .shot.seen .hud .plates{transition-delay:1.5s}
+
+/* ---------- 拟声词：超大爆字 + 放射爆线 ---------- */
+.p7 .sfx{position:absolute;z-index:7;border:0;padding:0;background:none;cursor:pointer;
+font:900 clamp(72px,13vw,170px)/1 var(--serif);color:var(--paper);letter-spacing:.02em;white-space:nowrap;
+text-shadow:0 0 2px var(--ink),3px 3px 0 var(--ink),-3px 3px 0 var(--ink),3px -3px 0 var(--ink),-3px -3px 0 var(--ink),10px 14px 0 rgba(27,24,20,.3);
+transform:rotate(-8deg)}
+.p7 .sfx--red{color:#FF6A4D}
+.p7 .sfx--gold{color:#F5C565}
+.p7 .sfx:focus-visible{outline:1px dashed var(--red);outline-offset:10px}
+.js .p7 .sfx{opacity:0}
+.js .p7 .shot.seen .sfx{opacity:1;animation:boing .8s var(--ease2) 1.05s both}
+.js .p7 .shot.seen .sfx.boing{animation:boing .7s var(--ease2) 0s both}
+@keyframes boing{0%{opacity:0;transform:rotate(-8deg) scale(2.6)}60%{opacity:1;transform:rotate(-8deg) scale(.92)}100%{opacity:1;transform:rotate(-8deg) scale(1)}}
+.p7 .burst{position:absolute;z-index:1;width:130vmax;height:130vmax;left:50%;top:50%;margin:-65vmax;pointer-events:none;opacity:0;
+background:repeating-conic-gradient(from 0deg,rgba(255,120,66,.3) 0 1.6deg,transparent 1.6deg 7deg)}
+.js .p7 .shot.seen .burst{opacity:1;animation:burstin 1.6s cubic-bezier(.2,.9,.3,1) .7s both}
+@keyframes burstin{from{opacity:0;transform:scale(.2) rotate(-30deg)}to{opacity:1;transform:scale(1) rotate(0)}}
+
+/* ---------- 场景特效：雨 / 网点 / 火 / 江 ---------- */
+.p7 .rain{position:absolute;inset:-10%;z-index:2;pointer-events:none;opacity:.55;
+background:repeating-linear-gradient(77deg,transparent 0 7px,rgba(190,205,220,.34) 7px 8px,transparent 8px 15px);
+background-size:300% 300%;animation:rainmove .55s linear infinite}
+@keyframes rainmove{from{background-position:0 0}to{background-position:-58px 116px}}
+.p7 .halftone{position:absolute;inset:0;z-index:1;pointer-events:none;opacity:.5;mix-blend-mode:overlay;
+background:radial-gradient(rgba(255,240,214,.2) 1px,transparent 1.4px);background-size:9px 9px}
+.p7 .vignette{position:absolute;inset:0;z-index:3;pointer-events:none;
+background:radial-gradient(120% 100% at 50% 42%,transparent 52%,rgba(10,7,4,.5) 100%)}
+.p7 .torch{filter:drop-shadow(0 0 7px rgba(255,150,60,.8))}
+.p7 .flick{animation:flick 2.8s ease-in-out infinite;transform-origin:center;filter:blur(1.2px)}
+.p7 .river-wave{animation:flow 6s linear infinite}
+@keyframes flow{to{transform:translateX(-46px)}}
+.p7 .fire{mix-blend-mode:screen}
+.p7 .fire{filter:blur(2.4px) saturate(1.1);animation:fireFlick 2.3s steps(1,end) infinite}
+.p7 .fire path{transform-box:fill-box;transform-origin:50% 100%;scale:.36;opacity:.86;animation:lick 1.9s ease-in-out infinite}
+.p7 .fire path:nth-child(2){animation-duration:1.5s;animation-delay:-.4s}
+.p7 .fire path:nth-child(3){animation-duration:2.3s;animation-delay:-.9s}
+.p7 .fire path:nth-child(4){animation-duration:1.6s;animation-delay:-1.3s}
+@keyframes lick{
+0%{transform:scale(1,1) skewX(0deg);opacity:.94}
+28%{transform:scale(.93,1.12) skewX(-2.4deg);opacity:1}
+54%{transform:scale(1.06,.9) skewX(2.8deg);opacity:.8}
+78%{transform:scale(.96,1.07) skewX(-1.4deg);opacity:.98}
+100%{transform:scale(1,1) skewX(0deg);opacity:.94}}
+.p7 .fireglow{position:absolute;inset:0;z-index:2;pointer-events:none;mix-blend-mode:screen;opacity:.4;
+background:radial-gradient(58% 70% at 80% 62%,rgba(255,120,40,.6),rgba(255,120,40,.14) 55%,transparent 78%)}
+.js .p7 .shot.seen .fireglow{animation:breathe 2.6s ease-in-out infinite .8s}
+@keyframes breathe{0%,100%{opacity:.42}50%{opacity:.7}}
+
+/* ---------- 底部渐变遮罩：文字区落在干净夜色上 ---------- */
+.p7 .floor-fade{position:absolute;left:0;right:0;bottom:0;height:46%;z-index:2;pointer-events:none;
+background:linear-gradient(transparent,rgba(33,28,22,.72) 55%,var(--night) 92%)}
+#s5 .floor-fade{height:58%;background:linear-gradient(transparent,rgba(33,28,22,.85) 52%,var(--night) 88%)}
+
+/* 夜格上导航可读性：纸色渐变顶/底带 */
+html[data-theme=p7] .nav{background:linear-gradient(rgba(247,242,233,.94),rgba(247,242,233,.78) 62%,transparent)}
+html[data-theme=p7] .pager{background:linear-gradient(transparent,rgba(247,242,233,.92) 55%)}
+
+/* ---------- 衔接渐变带：纸沉夜 / 火光转天亮 ---------- */
+.p7 .fade-top{position:absolute;left:0;right:0;top:0;height:120px;z-index:4;pointer-events:none}
+.p7 .fade-paper{background:linear-gradient(var(--paper),transparent)}
+.p7 .fade-ember{background:linear-gradient(#3A1E12,rgba(58,30,18,.4) 45%,transparent)}
+
+/* ---------- 电令格（纸色） ---------- */
+.p7 .shot--paper{background:var(--paper)}
+.p7 .wire{position:absolute;left:8%;top:24%;max-width:430px;padding:26px 28px 20px;background:#FDF9EF;border:2px solid var(--ink);
+box-shadow:8px 10px 0 rgba(27,24,20,.22)}
+.p7 .wire h3{margin-bottom:14px;font:300 10px var(--mono);letter-spacing:.3em;color:var(--dim)}
+.p7 .wire p{font:500 18px/2 var(--serif);letter-spacing:.03em}
+.p7 .wire p b{color:var(--red);font-weight:900}
+.p7 .wire .chop{float:right;margin:2px -10px 0 12px;padding:8px 9px;border:2px solid var(--red);color:var(--red);
+font:900 13px/1.5 var(--serif);writing-mode:vertical-rl;letter-spacing:.18em;transform:rotate(3deg);opacity:.92}
+.p7 .dots-morse{display:flex;gap:8px;align-items:center;margin-top:16px;font:300 12px var(--mono);color:var(--dim)}
+.p7 .dots-morse i{width:5px;height:5px;border-radius:50%;background:var(--red);opacity:.25}
+.js .p7 .shot.seen .dots-morse i{animation:blink .9s steps(1) infinite}
+.p7 .dots-morse i:nth-child(2){animation-delay:.18s!important}
+.p7 .dots-morse i:nth-child(3){animation-delay:.36s!important}
+.p7 .dots-morse i:nth-child(4){animation-delay:.54s!important}
+@keyframes blink{0%,49%{opacity:1}50%,100%{opacity:.15}}
+.p7 .telegram-mark{position:absolute;right:6%;top:16%;pointer-events:none;
+font:900 clamp(120px,24vw,300px)/1.05 var(--serif);writing-mode:vertical-rl;letter-spacing:.1em;color:rgba(27,24,20,.07)}
+.p7 .paper-rays{position:absolute;inset:0;pointer-events:none;opacity:.6;
+background:repeating-conic-gradient(from 160deg at 20% 80%,rgba(169,120,47,.06) 0 1deg,transparent 1deg 5deg)}
+
+/* ---------- 铁索画线 ---------- */
+.p7 .chain{fill:none;stroke:#C8B9A2;stroke-width:1.5;stroke-linecap:round;stroke-dasharray:1;stroke-dashoffset:1}
+.p7 .chain--rail{stroke:#8F8172;stroke-width:1.1}
+.js .p7 .shot.seen .chain{stroke-dashoffset:0;transition:stroke-dashoffset 1.15s cubic-bezier(.5,0,.3,1) .6s}
+.js .p7 .shot.seen .chain:nth-of-type(2n){transition-delay:.75s}
+.js .p7 .shot.seen .chain:nth-of-type(3n){transition-delay:.9s}
+.js .p7 .shot.seen .chain:nth-of-type(5n){transition-delay:1.05s}
+html:not(.js) .p7 .chain{stroke-dashoffset:0}
+
+/* ---------- 攀索勇士 ---------- */
+.js .p7 .layer use{opacity:0;transition:opacity .55s ease-out}
+.js .p7 .shot.seen .layer use{opacity:1;transition-delay:1.3s}
+.js .p7 .shot.seen .layer use:nth-of-type(2){transition-delay:1.45s}
+.js .p7 .shot.seen .layer use:nth-of-type(3){transition-delay:1.6s}
+.js .p7 .shot.seen .layer use:nth-of-type(4){transition-delay:1.75s}
+.js .p7 .shot.seen .layer use:nth-of-type(5){transition-delay:1.9s}
+.js .p7 .shot.seen .layer use:nth-of-type(6){transition-delay:2.05s}
+.js .p7 .shot.seen .layer use:nth-of-type(7){transition-delay:2.2s}
+.js .p7 .shot.seen .layer use:nth-of-type(8){transition-delay:2.35s}
+html:not(.js) .p7 .layer use{opacity:1}
+
+/* ---------- 名牌 ---------- */
+.p7 .plates{display:grid;grid-template-columns:repeat(11,1fr);gap:6px}
+.p7 .plate{padding:7px 2px 5px;text-align:center;border:1.4px solid rgba(27,24,20,.5);background:rgba(255,255,255,.78)}
+.p7 .plate b{display:block;font:500 12px/1.5 var(--serif);letter-spacing:.02em}
+.p7 .plate i{display:block;font:300 8px var(--mono);font-style:normal;letter-spacing:.06em;color:var(--dim)}
+.p7 .plate--blank b{color:rgba(27,24,20,.28)}
+.p7 .plate--blank i{color:rgba(27,24,20,.35)}
+
+/* ---------- 铺桥板 ---------- */
+.p7 .plank{fill:#7A6248;stroke:#14100C;stroke-width:.6}
+.js .p7 .plank{opacity:0}
+.js .p7 .shot.seen .plank{opacity:1;transition:opacity .4s ease-out 1.2s}
+.js .p7 .shot.seen .plank:nth-of-type(2n){transition-delay:1.34s}
+.js .p7 .shot.seen .plank:nth-of-type(3n){transition-delay:1.48s}
+.js .p7 .shot.seen .plank:nth-of-type(4n){transition-delay:1.62s}
+html:not(.js) .p7 .plank{opacity:1}
+
+/* ---------- 各格 HUD 摆位 ---------- */
+.p7 .hud .nbx{position:absolute;left:5vw;bottom:150px}
+.p7 .hud .stamp{position:absolute;right:6vw;bottom:170px}
+.p7 .hud .bub{position:absolute}
+#s1 .hud .nbx{bottom:120px}
+#s1 .hud .stamp{top:120px;bottom:auto;right:6vw}
+.js .p7 .wire{opacity:0;transform:translateY(34px) rotate(-1.2deg)}
+.js .p7 .shot.seen .wire{opacity:1;transform:rotate(-1.2deg);transition:opacity .7s ease-out .4s,transform .9s var(--ease) .4s}
+#s2 .hud .bub.b2{right:6vw;bottom:320px}
+#s2 .hud .bub.b3{right:12vw;bottom:230px}
+#s3 .hud .bub.b2{right:7vw;top:22%}
+#s3 .hud .bub.b3{left:8vw;top:34%}
+#s4 .hud .bub.b2{right:7vw;top:24%}
+#s5 .hud .nbx{bottom:300px;max-width:440px}
+#s5 .hud .plates{position:absolute;left:5vw;right:5vw;bottom:118px}
+#s5 .hud .plate-note{position:absolute;left:5vw;bottom:96px;font:300 10px var(--mono);letter-spacing:.14em;color:rgba(27,24,20,.55)}
+#s6 .hud .nbx{bottom:130px}
+#s7 .hud .nbx{bottom:140px}
+#s2 .hud .stamp{right:6vw;bottom:150px}
+
+/* ---------- 结尾格 ---------- */
+.p7 .shot--end{background:var(--paper)}
+.p7 .endline{position:absolute;left:0;right:0;top:38%;text-align:center;padding:0 7vw}
+.p7 .endline .t{font:900 clamp(28px,4.6vw,52px)/1.6 var(--serif);letter-spacing:.1em}
+.p7 .endline .t b{color:var(--red)}
+.p7 .endline .d{margin-top:22px;font-size:14px;letter-spacing:.14em;color:var(--dim)}
+
+/* ---------- 胶片进度 ---------- */
+.p7bar{position:fixed;z-index:42;left:50%;bottom:64px;transform:translateX(-50%);display:flex;gap:0;
+padding:8px 12px;background:rgba(27,24,20,.9);box-shadow:0 10px 26px -12px rgba(27,24,20,.6)}
+.p7bar::before,.p7bar::after{content:"";position:absolute;top:0;bottom:0;width:7px;
+background:repeating-linear-gradient(transparent 0 3px,rgba(247,242,233,.4) 3px 6px)}
+.p7bar::before{left:2px}.p7bar::after{right:2px}
+.p7bar button{width:46px;height:26px;margin:0 2px;border:0;background:none;color:rgba(247,242,233,.55);
+font:400 11px var(--sans);letter-spacing:.06em;cursor:pointer;transition:color .3s,background .3s}
+.p7bar button:hover{color:#fff}
+.p7bar button.on{color:#1B1814;background:var(--gold)}
+
+/* ---------- 小征 ---------- */
+.p7 .ask{position:fixed;right:4vw;bottom:128px;z-index:40;max-width:330px;padding:18px 20px;background:#FBF4ED;border:1px solid rgba(192,57,43,.45);
+opacity:0;transform:translateY(12px);pointer-events:none;transition:opacity .9s ease-out,transform .9s var(--ease)}
+.p7 .ask.on{opacity:1;transform:none;pointer-events:auto}
+.p7 .ask__h{margin-bottom:12px;font:300 10px var(--mono);letter-spacing:.26em;color:var(--red)}
+.p7 .ask p{font-size:14px;line-height:1.95;color:rgba(27,24,20,.85)}
+
+/* ---------- 响应式 ---------- */
+@media (max-width:760px){
+  .p7 .tag{top:64px;left:5vw}
+  .p7 .sfx{font-size:clamp(56px,17vw,110px)}
+  .p7 .hud .nbx{left:5vw;right:5vw;max-width:none;bottom:128px;font-size:13px;padding:12px 14px}
+  .p7 .hud .stamp{right:6vw;bottom:auto;top:110px}
+  .p7 .bub{max-width:230px;font-size:13px;padding:9px 13px}
+  #s2 .hud .bub.b2{right:5vw;bottom:auto;top:22%}
+  #s2 .hud .bub.b3{right:10vw;bottom:auto;top:36%}
+  #s3 .hud .bub.b2{top:18%}
+  #s3 .hud .bub.b3{top:32%}
+  #s5 .hud .nbx{bottom:340px}
+  #s5 .hud .plates{grid-template-columns:repeat(6,1fr);bottom:118px}
+  #s5 .hud .plate i{display:none}
+  #s5 .hud .plate-note{bottom:100px;font-size:9px}
+  /* 宽幅画面在竖屏改为「画带」：上留夜色带、下留旁白带 */
+  #s6{background:#0A0603}
+  #s6 .scene{inset:0;top:13%;height:54%}
+  #s6 .scene svg{transform:scale(1.02)}
+  #s6 .hud .nbx{bottom:120px}
+  .p7 .wire{left:6%;right:6%;top:22%;padding:20px 22px 16px}
+  .p7 .wire p{font-size:16px}
+  .p7 .telegram-mark{right:2%;top:8%;opacity:.6}
+  .p7bar{bottom:58px;transform:translateX(-50%) scale(.88)}
+  .p7bar button{width:38px;font-size:10px}
+  .p7 .ask{left:5vw;right:5vw;max-width:none}
+}
+@media (prefers-reduced-motion:reduce){
+  html[data-theme=p7]{scroll-snap-type:none}
+  .js .p7 .shot .scene,.js .p7 .shot.seen .scene{animation:none!important;transform:none!important}
+  .js .p7 .hud .nbx,.js .p7 .hud .bub,.js .p7 .hud .stamp,.js .p7 .hud .plates,.js .p7 .hud .endline{opacity:1!important;transform:none!important;transition:none!important}
+  .js .p7 .sfx{opacity:1!important;animation:none!important}
+  .js .p7 .shot--quake.seen{animation:none!important}
+  .p7 .flash,.p7 .burst{display:none!important}
+  .p7 .chain{stroke-dashoffset:0!important;transition:none!important}
+  .p7 .plank{opacity:1!important}
+  .p7 .layer use{opacity:1!important}
+  .p7 .rain,.p7 .flick,.p7 .river-wave,.p7 .fire path,.p7 .fireglow,.p7 .cover .roll i{animation:none!important}
+  .p7 .cover h1{opacity:1;animation:none;filter:none}
+  .p7bar{display:none}
+}
+
+/* ---------- 火：流动的火线与上升的火星 ---------- */
+.p7 .torch{animation:fireRun .9s linear infinite}
+@keyframes fireRun{to{stroke-dashoffset:-31}}
+
+.p7 .spark{fill:#FFC46B;pointer-events:none}
+.p7 .spark.b{fill:#FF8A3C}
+@keyframes ember{
+  0%{opacity:0;transform:translate(0,0) scale(.5)}
+  14%{opacity:.95}
+  55%{opacity:.55;transform:translate(calc(var(--dx) * .5),-24px) scale(.85)}
+  100%{opacity:0;transform:translate(var(--dx),-56px) scale(.35)}
+}
+
+/* ---------- 人：火光边缘 + 攀爬的轻微起伏 ---------- */
+.p7 .bead circle{fill:#E8DCC4;animation:beadPulse 4.4s ease-in-out infinite}
+.p7 .bead .bead-ring{fill:none;stroke:#E8DCC4;stroke-width:.9;opacity:.5;animation:none}
+@keyframes beadPulse{0%,100%{opacity:.4}46%{opacity:.95}100%{opacity:.4}}
+.p7 .num22{font-weight:900;letter-spacing:.04em;opacity:.055;pointer-events:none}
+@keyframes climbBob{0%,100%{translate:0 0}50%{translate:0 -2.2px}}
+.p7 use[id]{} /* 占位，避免误匹配 */
+
+/* ---------- 胶片条：自动放映进度 + 播放键 ---------- */
+.p7bar__play{width:26px!important;height:26px!important;margin-right:6px!important;
+border:1px solid rgba(247,242,233,.3)!important;color:rgba(247,242,233,.8)!important;
+font:400 11px var(--mono)!important;line-height:1!important}
+.p7bar__play:hover{background:rgba(247,242,233,.12)!important;color:#fff!important}
+.p7bar__p{position:absolute;left:12px;right:12px;bottom:4px;height:1.5px;background:rgba(247,242,233,.14);overflow:hidden}
+.p7bar__p i{display:block;height:100%;background:var(--gold);transform-origin:left;transform:scaleX(var(--p,0))}
+.p7bar.off .p7bar__p{opacity:.25}
+
+@media (prefers-reduced-motion:reduce){
+  .p7 .torch{animation:none}
+  .p7 .spark{display:none}
+}
+
+/* ---------- 接缝融合：上下两格之间压一条柔光带，消掉硬边 ---------- */
+.p7 .shot::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:14vh;z-index:4;pointer-events:none;
+background:linear-gradient(to bottom,transparent,rgba(33,28,22,.55) 62%,var(--night))}
+.p7 .shot--cover::after,.p7 .shot--paper::after,.p7 .shot--end::after{
+background:linear-gradient(to bottom,transparent,rgba(247,242,233,.6) 62%,var(--paper))}
+.p7 .shot::before{content:"";position:absolute;left:0;right:0;top:0;height:10vh;z-index:4;pointer-events:none;
+background:linear-gradient(to bottom,rgba(33,28,22,.16),transparent)}
+.p7 .shot--cover::before,.p7 .shot--paper::before,.p7 .shot--end::before{display:none}
+
+/* 跨色接缝：纸入夜 / 夜回纸，底色顺着渐变过去，不切一刀 */
+.p7 .shot.to-night::after{background:linear-gradient(to bottom,transparent,rgba(33,28,22,.5) 55%,rgba(33,28,22,.92) 88%,var(--night))}
+.p7 .shot.to-paper::after{background:linear-gradient(to bottom,transparent,rgba(247,242,233,.55) 55%,rgba(247,242,233,.94) 88%,var(--paper))}
+.p7 .shot.to-night::before{height:0}
+.p7 .shot.to-paper::before{height:0}
+
+/* ---------- 队伍的表达：不画人，让"东西"流动起来 ---------- */
+/* 中索上跑过一段火光：火沿着铁索往前走 */
+.p7 .hot{fill:none;stroke:#FFC46B;stroke-width:3;stroke-linecap:round;
+stroke-dasharray:46 900;stroke-dashoffset:0;opacity:.92;
+filter:drop-shadow(0 0 8px rgba(255,150,60,.95));
+animation:hotRun 6.5s linear infinite}
+@keyframes hotRun{from{stroke-dashoffset:0}to{stroke-dashoffset:-946}}
+
+/* 过桥：两道刻线顺着桥面流过去，像一列人在走 */
+.p7 .column{fill:none;stroke:#241F19;stroke-width:3.2;stroke-linecap:round;
+stroke-dasharray:3.2 17;opacity:.62;animation:colRun .62s linear infinite}
+.p7 .column.c2{stroke-width:2.2;opacity:.34;stroke-dasharray:2.4 22;animation-duration:.78s}
+@keyframes colRun{to{stroke-dashoffset:-21.6}}
+
+@media (prefers-reduced-motion:reduce){
+  .p7 .hot,.p7 .column{animation:none}
+}
+
+/* ---------- 火舌：从火苗顶端窜出去的小舌头 ---------- */
+.p7 .tongue{fill:#FFE2A6;transform-box:fill-box;transform-origin:50% 100%;pointer-events:none;
+animation:tongueOut 1.15s ease-out infinite;opacity:0}
+@keyframes tongueOut{
+0%{opacity:0;transform:scale(.45,.25)}
+18%{opacity:.95;transform:scale(.9,1.05)}
+52%{opacity:.7;transform:scale(1,1.55)}
+100%{opacity:0;transform:scale(.6,2.3)}}
+
+/* ---------- 烟：火头上方慢慢散开的暗雾 ---------- */
+.p7 .smoke{fill:#2E2118;opacity:0;filter:blur(7px);pointer-events:none;
+transform-box:fill-box;transform-origin:50% 100%;animation:smokeUp 7.5s linear infinite}
+@keyframes smokeUp{
+0%{opacity:0;transform:translateY(10px) scale(.6)}
+22%{opacity:.2}
+62%{opacity:.13;transform:translateY(-70px) scale(1.35)}
+100%{opacity:0;transform:translateY(-140px) scale(1.9)}}
+
+@media (prefers-reduced-motion:reduce){
+  .p7 .fire path,.p7 .tongue,.p7 .smoke{animation:none}
+  .p7 .tongue,.p7 .smoke{display:none}
+}
+
+.p7 .flick > path{transform-box:fill-box;transform-origin:50% 100%;scale:.42}
+
+@keyframes fireFlick{
+0%{opacity:1}11%{opacity:.84}19%{opacity:1}34%{opacity:.76}41%{opacity:.98}
+57%{opacity:.86}66%{opacity:1}78%{opacity:.8}86%{opacity:.97}100%{opacity:1}}
+@media (prefers-reduced-motion:reduce){.p7 .fire{animation:none}}
+
+/* ---------- 轻量模式：只保留排版、路线、滚动 ---------- */
+html.lite .p7 .rain,
+html.lite .p7 .halftone,
+html.lite .p7 .spark,
+html.lite .p7 .tongue,
+html.lite .p7 .smoke,
+html.lite .p7 .burst{display:none!important}
+
+html.lite .p7 .fire,
+html.lite .p7 .flick,
+html.lite .p7 .torch,
+html.lite .p7 .bead circle,
+html.lite .p7 .hot,
+html.lite .p7 .column,
+html.lite .p7 .river-wave{animation:none!important;filter:none!important}
+
+html.lite .p7 .bead circle{opacity:.72}
+
+html.lite .js .p7 .shot .scene,
+html.lite .js .p7 .shot.seen .scene{animation:none!important;transform:scale(1.02)!important}
+
+html.lite .p7 .shot::before,
+html.lite .p7 .shot::after{display:none}
+
+html.lite .p7 .vignette,html.lite .p7 .fireglow{mix-blend-mode:normal}
