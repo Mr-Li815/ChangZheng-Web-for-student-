@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="p6">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#eeeae1">
+<title>夜行 · 火种｜山河行军图谱</title>
+<meta name="description" content="沿着四支红军部队的行军路线，重访长征中的山河与历史坐标。">
+<link rel="stylesheet" href="../assets/style.css">
+<link rel="stylesheet" href="../assets/xz.css">
+<link rel="stylesheet" href="../assets/p6.css">
+</head>
+<body class="page spark-page" data-i="6">
+<a class="skip-link" href="#main">跳到正文</a>
+<main id="main" class="p6">
+  <section class="spark-intro" aria-labelledby="spark-title">
+    <div class="chapter-line"><span><i></i> 第六章 / 山河行军图谱</span><span>1934 — 1936 <b>CH. 06</b></span></div>
+    <div class="hero-grid">
+      <header class="spark-poster">
+        <p class="eyebrow">THE LONG MARCH / THE SPARK</p>
+        <h1 id="spark-title">火<span>种</span><sup>✳</sup></h1>
+        <h2>越过山河。<br>走向天亮。</h2>
+        <p class="hero-copy">四支队伍，一张地图。<br>二万五千里，每条线都有名字。</p>
+        <a class="text-link" href="#chronicle">重访那些历史坐标 <span>↘</span></a>
+        <div class="poster-bottom"><span class="poster-number">06</span><p>路，在脚下延伸。<br>火种，在行进中不灭。</p><span class="poster-cross" aria-hidden="true">＋</span></div>
+      </header>
+      <div class="atlas" id="atlas">
+        <div class="atlas-heading"><h2><span class="live-dot"></span> 长征 · 行军图谱</h2><span>ROUTE ATLAS / 01—04</span></div>
+        <div class="mapbox">
+          <svg id="map" role="group" aria-label="红军长征行军路线示意图，可通过下方部队按钮与节点按钮探索"></svg>
+          <span class="map-corner corner-tl" aria-hidden="true"></span><span class="map-corner corner-br" aria-hidden="true"></span>
+          <div class="map-readout" aria-hidden="true"><span>中国工农红军</span><b id="map-route-name">红一方面军</b><span id="map-route-period">1934.10 — 1935.10</span><strong id="map-current-place">于都</strong></div>
+          <span class="map-orientation" aria-hidden="true">N<br>↑</span>
+          <div class="map-tools" aria-label="地图控制">
+            <button type="button" id="play-route" aria-pressed="false"><span aria-hidden="true">▶</span> 播放路线</button>
+            <button type="button" id="map-zoom" aria-pressed="false">＋ 放大</button>
+            <button type="button" id="map-overview" aria-pressed="false">↗ 全图</button>
+          </div>
+          <p class="map-hint">点选坐标，打开历史现场</p>
+          <div class="map-card" id="map-card" role="group" aria-live="polite" aria-atomic="true" hidden>
+            <button class="map-card-x" type="button" id="mc-close" aria-label="关闭事件卡片">×</button>
+            <p class="map-card-meta"><span id="mc-index">01 / 12</span><span id="mc-date">1934.10.17</span></p>
+            <h3 id="mc-title">于都出发</h3>
+            <p class="map-card-copy" id="mc-copy"></p>
+            <a class="map-card-src" id="mc-source" href="#" target="_blank" rel="noopener noreferrer">资料来源 ↗</a>
+            <div class="map-card-step"><button type="button" id="mc-prev" aria-label="上一个历史节点">←</button><button type="button" id="mc-next" aria-label="下一个历史节点">→</button></div>
+          </div>
+        </div>
+        <div class="playback-strip"><span id="playback-state">待出发</span><progress id="route-progress" max="1" value="0" aria-label="路线播放进度"></progress><span id="playback-percent">0%</span><label>速度 <select id="playback-speed" aria-label="路线播放速度"><option value="0.75" selected>慢速</option><option value="0.5">更慢</option><option value="1">舒缓</option></select></label></div>
+        <nav class="armies" id="armies" aria-label="选择长征部队"></nav>
+        <p class="atlas-source">路线及节点位置为史料示意，未还原全部支线。底图：DataV.GeoAtlas。<span>缩放后可拖动 · Esc 复位</span></p>
+      </div>
+    </div>
+  </section>
+  <section class="distance" aria-labelledby="distance-title">
+    <div class="section-label"><span>01 / 距离的另一面</span><span>BEYOND THE DISTANCE</span></div>
+    <div class="distance-grid">
+      <div class="distance-primary"><h2 id="distance-title">二万五千里，<br>不是一个抽象的数字。</h2><p class="distance-number"><span data-stat="25000" aria-hidden="true">25,000</span><span class="sr-only">25,000</span><span>里</span></p><p class="stat-caption">最远行程 · 中央红军</p><svg class="distance-route" viewBox="0 0 620 110" aria-hidden="true"><path d="M0 90 65 90 100 50 145 70 215 10 280 52 337 40 388 80 455 18 500 40 560 5 620 5"/><circle cx="560" cy="5" r="4"/></svg></div>
+      <div class="distance-aside"><div class="day-stat"><span>日夜兼程</span><b><span data-stat="373" aria-hidden="true">373</span><span class="sr-only">373</span><small>天</small></b><p>1934.10 — 1935.10<br>中央红军长征历时</p></div><div class="people-stat"><p>从出发，到突破湘江</p><div><b><span data-stat="8.6" aria-hidden="true">8.6</span><span class="sr-only">8.6</span><small>万余人</small></b><span>↘</span><b><span data-stat="3" aria-hidden="true">3</span><span class="sr-only">3</span><small>万余人</small></b></div><div class="people-bars" aria-hidden="true"><i></i><i></i></div><small>中央红军出发人数 / 湘江战役后人数</small></div></div>
+    </div>
+  </section>
+  <section class="chronicle" id="chronicle" aria-labelledby="chronicle-title">
+    <div class="section-label"><span>02 / 时间留下的坐标</span><span>HISTORY IN MOTION</span></div>
+    <div class="chronicle-head"><h2 id="chronicle-title">山河为证。</h2><p>从出发、转折，到会师。<br>点选年份，回到行军的现场。</p></div>
+    <div class="chronicle-grid">
+      <div class="year-tabs" role="tablist" aria-label="选择历史年份" aria-orientation="vertical">
+        <button type="button" role="tab" id="year-1934" aria-controls="era-1934" aria-selected="true" tabindex="0"><span>1934</span><small>出发 · 血战</small><i>↗</i></button>
+        <button type="button" role="tab" id="year-1935" aria-controls="era-1935" aria-selected="false" tabindex="-1"><span>1935</span><small>转折 · 北上</small><i>↗</i></button>
+        <button type="button" role="tab" id="year-1936" aria-controls="era-1936" aria-selected="false" tabindex="-1"><span>1936</span><small>会师</small><i>↗</i></button>
+      </div>
+      <div class="era-panels">
+        <div class="era" id="era-1934" role="tabpanel" aria-labelledby="year-1934" tabindex="0"><ol>
+          <li><time>10.17</time><div><h3>于都，出发。</h3><p>中央红军主力 8.6 万余人从江西于都出发，开始战略转移。</p></div><span>01</span></li>
+          <li><time>11.27</time><div><h3>血战湘江</h3><p>血战五昼夜突破第四道封锁线，中央红军锐减至 3 万余人。</p></div><span>02</span></li>
+          <li><time>12.18</time><div><h3>黎平会议</h3><p>采纳毛泽东向贵州转兵的主张，改变原定去湘西的计划。</p></div><span>03</span></li>
+        </ol></div>
+        <div class="era" id="era-1935" role="tabpanel" aria-labelledby="year-1935" tabindex="0" hidden><ol>
+          <li><time>01.15</time><div><h3>遵义会议</h3><p>事实上确立了毛泽东在党中央和红军的领导地位。</p></div><span>01</span></li>
+          <li><time>01.19</time><div><h3>四渡赤水</h3><p>在川黔滇边声东击西，摆脱数十万敌军的围追堵截。</p></div><span>02</span></li>
+          <li><time>05.03</time><div><h3>巧渡金沙江</h3><p>七条小船九天九夜，跳出敌军包围圈。</p></div><span>03</span></li>
+          <li><time>05.25</time><div><h3>强渡大渡河</h3><p>十七勇士在安顺场乘船强渡成功。</p></div><span>04</span></li>
+          <li><time>05.29</time><div><h3>飞夺泸定桥</h3><p>二十二名突击队员攀着十三根铁索冲过火海。</p></div><span>05</span></li>
+          <li><time>06.18</time><div><h3>翻越夹金山</h3><p>长征途中第一座大雪山，海拔 4000 多米。</p></div><span>06</span></li>
+          <li><time>08</time><div><h3>过草地</h3><p>茫茫水草地七天七夜，以野菜、皮带充饥。</p></div><span>07</span></li>
+          <li><time>09.17</time><div><h3>突破腊子口</h3><p>打开北上进入甘南的通道。</p></div><span>08</span></li>
+          <li><time>10.19</time><div><h3>到达陕北吴起镇</h3><p>历时一年、纵横十余省，中央红军长征胜利结束。</p></div><span>09</span></li>
+        </ol></div>
+        <div class="era" id="era-1936" role="tabpanel" aria-labelledby="year-1936" tabindex="0" hidden><ol>
+          <li><time>10.09</time><div><h3>会宁会师</h3><p>红一方面军与红四方面军在会宁会师。</p></div><span>01</span></li>
+          <li><time>10.22</time><div><h3>将台堡会师</h3><p>红二方面军到达将台堡，三大主力会师，长征胜利结束。</p></div><span>02</span></li>
+        </ol></div>
+      </div>
+    </div>
+  </section>
+  <a class="next-chapter" href="p7-comic.html"><span>继续前行 / CHAPTER 07</span><strong>把这段路，<br>放进下一帧。</strong><b aria-hidden="true">↗</b><span>下一章 · 分镜</span></a>
+</main>
+<script src="../assets/app.js"></script>
+<script src="../assets/config.js"></script>
+<script src="../assets/kb.js"></script>
+<script src="../assets/xz.js"></script>
+<script src="../assets/china-geo.js"></script>
+<script src="../assets/p6.js"></script>
+</body>
+</html>
+

@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="p8">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#F6F1E7">
+<title>夜行 · 天亮</title>
+<link rel="stylesheet" href="../assets/style.css">
+<link rel="stylesheet" href="../assets/xz.css">
+</head>
+<body class="page" data-i="8">
+<a class="skip-link" href="#main">跳到正文</a>
+<main id="main">
+
+  <section class="close" aria-label="收束">
+    <svg class="route echo" id="echo" aria-hidden="true"></svg>
+    <button class="match" id="match" style="--md:.3s;--my:26%" disabled aria-hidden="true" tabindex="-1">
+      <span class="glow"></span><span class="head"></span><span class="stick"></span>
+    </button>
+    <div class="outro">
+      <p class="t">路还在。</p>
+      <div class="acts">
+        <a class="btn" href="p5-run.html" data-reset>再走一次</a>
+        <a class="btn" href="../index.html">返回首页</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="leave">
+    <p class="cap">留一句话</p>
+    <p class="lead">二十字以内。留在这里，也留给自己。</p>
+    <form id="f" autocomplete="off">
+      <input id="m" maxlength="20" placeholder="……" aria-label="你的话">
+      <button class="btn" type="submit">留下</button>
+    </form>
+    <div class="mcard" id="card" hidden>
+      <p class="mcard__t" id="cardT"></p>
+      <p class="mcard__f">夜行 · 以我青春，续写长征华章</p>
+    </div>
+    <ul class="msgs" id="list" aria-label="留下的话"></ul>
+  </section>
+
+</main>
+<script src="../assets/app.js"></script>
+<script src="../assets/config.js"></script>
+<script src="../assets/kb.js"></script>
+<script src="../assets/xz.js"></script>
+<script src="../assets/wall.js"></script>
+</body>
+</html>

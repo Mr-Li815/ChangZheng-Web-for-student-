@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="p5">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#F2ECE0">
+<title>夜行 · 入列</title>
+<link rel="stylesheet" href="../assets/style.css">
+<link rel="stylesheet" href="../assets/p5hub.css">
+<link rel="stylesheet" href="../assets/story.css">
+<link rel="stylesheet" href="../assets/xz.css">
+</head>
+<body class="page" data-i="5">
+<a class="skip-link" href="#main">跳到正文</a>
+<main id="main" class="act story">
+  <a class="back" href="p5-follow.html">← 同行</a>
+  <p class="cap">入列</p>
+  <h1>你的长征</h1>
+  <p class="lead">写下你是谁、平时做什么，再说一句想看的故事。</p>
+  <p class="off" id="off" hidden>没有接 API。以下是离线版，基础功能都能用。</p>
+
+  <form id="sf" class="sf" autocomplete="off" novalidate>
+    <div class="sf__in">
+      <p class="ln"><label for="fn">我叫</label><input id="fn" name="n" maxlength="8" placeholder="名字"></p>
+      <p class="ln"><label for="fi">我是</label><input id="fi" name="i" maxlength="20" placeholder="比如：高三学生"></p>
+      <p class="ln"><label for="fd">平时</label><input id="fd" name="d" maxlength="30" placeholder="比如：学计算机网络，会修电脑"></p>
+      <p class="ln ln--o"><label for="fo">想看</label><textarea id="fo" name="o" rows="2" maxlength="120" placeholder="比如：想看我怎么把一封信送过泸定桥"></textarea></p>
+      <fieldset class="chips">
+        <legend>走到哪儿</legend>
+        <label><input type="radio" name="p" value="" checked><span>都行</span></label>
+        <label><input type="radio" name="p" value="于都"><span>于都</span></label>
+        <label><input type="radio" name="p" value="湘江"><span>湘江</span></label>
+        <label><input type="radio" name="p" value="遵义"><span>遵义</span></label>
+        <label><input type="radio" name="p" value="泸定桥"><span>泸定桥</span></label>
+        <label><input type="radio" name="p" value="夹金山"><span>夹金山</span></label>
+        <label><input type="radio" name="p" value="草地"><span>草地</span></label>
+        <label><input type="radio" name="p" value="腊子口"><span>腊子口</span></label>
+        <label><input type="radio" name="p" value="吴起镇"><span>吴起镇</span></label>
+      </fieldset>
+      <button class="go" type="submit"><span>写下去</span><i aria-hidden="true">→</i></button>
+      <p class="err" id="err" role="alert"></p>
+    </div>
+  </form>
+
+  <section class="out" id="out" hidden aria-live="polite">
+    <div class="ld" id="ld">
+      <svg viewBox="0 0 200 40" aria-hidden="true"><path pathLength="1" d="M2 30C40 4 60 38 100 20S160 6 198 14"/></svg>
+      <p>正在写。</p>
+    </div>
+    <article class="sto" id="sto" hidden>
+      <h2 class="sto__t" id="stoT" tabindex="-1"></h2>
+      <p class="sto__by" id="stoBy"></p>
+      <div class="sto__b" id="stoB"></div>
+      <p class="sto__f" id="stoF" hidden></p>
+      <p class="sto__n" id="stoN"></p>
+      <div class="qact" id="acts" hidden>
+        <button class="btn" type="button" id="again">再写一段</button>
+        <button class="btn" type="button" id="restart">重填</button>
+        <button class="btn" type="button" id="copy">复制</button>
+        <a class="btn" href="p5-follow.html">返回同行</a>
+      </div>
+    </article>
+  </section>
+</main>
+<script src="../assets/app.js"></script>
+<script src="../assets/config.js"></script>
+<script src="../assets/kb.js"></script>
+<script src="../assets/xz.js"></script>
+<script src="../assets/story.js"></script>
+</body>
+</html>
