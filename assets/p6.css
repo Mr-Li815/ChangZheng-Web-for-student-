@@ -204,3 +204,74 @@ text-decoration:none;border-bottom:1px solid transparent}
 color:#cfd6c2;font:12px/1 Arial;cursor:pointer}
 .map-card-step button:hover{background:#e4e6d6;color:#252923;border-color:#e4e6d6}
 @media(max-width:520px){.map-card{width:200px;padding:11px 12px 10px}.map-card h3{font-size:14px}.map-card-copy{font-size:10px;line-height:1.7}}
+
+/* 暖白导航底图：浅色行政区、蓝色水系与四支队伍的独立路线色。 */
+.mapbox{background:#fffdf8;color:#41503b;border-radius:14px 14px 0 0}
+.mapbox::after{border:1px solid #d9dfd1;border-radius:inherit;box-shadow:inset 0 0 30px #c8d3bd0d}
+.p6 .grid line{stroke:#b9c3ae;opacity:.16}
+.p6 .outfill{fill:#f7f6ef}
+.p6 .prov{fill:var(--province-fill,#fbfaf5);stroke:#d0d6c7;stroke-width:.75}
+.p6 .border{stroke:#adb9a2;stroke-width:1;opacity:.85}.p6 .isles{fill:#abbba0;opacity:.7}
+.p6 .provlab{fill:#73856e;opacity:.88;letter-spacing:.12em}
+.p6 .riv{stroke:#96bfca;stroke-width:1.35;opacity:.85}.p6 .rivlab{fill:#5b91a0;opacity:.9}
+.p6 .route-active{filter:none}
+.p6 .wp .dot{fill:#fffdf8;stroke:var(--route-color);stroke-width:1.3}
+.p6 .wp .wlab{fill:var(--route-color);stroke:#fffdf8;stroke-width:3.2;paint-order:stroke;stroke-linejoin:round}
+.p6 .wp .wlab-t{font-weight:600}.p6 .wp .wlab-n{fill:#71836c;opacity:1}
+.p6 .wp.on .wlab,.p6 .wp:hover .wlab{fill:var(--route-color)}
+.p6 .wp.on .wlab-n{fill:var(--route-color);opacity:.85}
+.p6 .wp.reached .dot{fill:var(--route-color);stroke:#fffdf8;stroke-width:1.5}
+.p6 .wp.on .dot,.p6 .wp:hover .dot,.p6 .wp:focus .dot{fill:var(--route-color);stroke:#fffdf8;stroke-width:2.2}
+.p6 .wp .label-lead{opacity:.6}.p6 .wp:focus-visible .halo{stroke:var(--route-color)}
+.p6 .runner{fill:#fffdf8;stroke:var(--route-color);filter:none}.p6 .runner-ring{opacity:.45}
+.map-readout{left:18px;top:18px;min-width:0;width:190px;max-width:calc(100% - 70px);padding:12px 14px;border-radius:10px;
+ background:#fffefaf0;box-shadow:0 3px 18px -7px #65705738;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.map-readout span{color:#7a8771}.map-readout b{color:var(--route-color)}
+.map-readout strong{margin-top:6px;font-size:23px;color:var(--route-color)}
+.map-orientation{color:#6f8265}.map-corner{border-color:#b9c5ae}
+.map-tools button{min-height:36px;border-color:#d7dece;border-radius:8px;background:#fffefbed;color:#56674b;box-shadow:0 2px 8px -4px #6c785148}
+.map-tools button:hover,.map-tools button[aria-pressed=true]{border-color:#c7d2bc;background:#eaf0e2;color:#36522f}
+.map-hint{padding:5px 8px;border-radius:6px;background:#fffefbcc;color:#788369}
+.playback-strip{background:#fffdf8;color:#6a775f;border-color:#d9dfd1}
+.playback-strip select{border-color:#d4ddca;border-radius:5px;background:#fffefb;color:#4c6440}
+#playback-percent{color:#5b6f50}#route-progress{background:#e2e8db;accent-color:var(--route-color)}
+#route-progress::-webkit-progress-bar{background:#e2e8db}
+.armies{overflow:hidden;border-color:#d9dfd1;border-radius:0 0 12px 12px;background:#fffdf8}
+.army{background:#fffdf8;border-color:#e3e7dc}.army b{color:var(--army)}
+.army.on,.army:hover{background:#f1f4eb;background:color-mix(in srgb,var(--army) 7%,#fffdf8);color:var(--army)}
+.army.on small,.army:hover small,.army.on>span,.army:hover>span{color:#6b7e60}
+.army small i{height:3px;border-radius:3px}
+
+/* 节点说明配图与史料并排；无对应图片时自然恢复为文字卡。 */
+.map-card{width:min(360px,calc(100% - 24px));padding:15px 16px 13px;border-color:#d7dccd;border-radius:12px;
+ background:#fffefbf7;color:#43503b;box-shadow:0 16px 38px -15px #4e573c45;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.map-card::before{left:0;right:0;top:0;border-radius:12px 12px 0 0}
+.map-card-x{color:#7c8870}.map-card-x:hover{color:var(--route-color)}
+.map-card-meta{color:#859076;letter-spacing:.03em}.map-card h3{color:var(--route-color);font-size:17px;margin-top:7px}
+.map-card-body{margin-top:8px}.map-card.has-photo .map-card-body{display:grid;grid-template-columns:minmax(0,1fr) 112px;align-items:start;gap:13px}
+.map-card-copy{margin:0;font-size:11px;line-height:1.85;color:#56634b}
+.map-card-photo{min-width:0;margin:0}.map-card-photo[hidden]{display:none}
+.map-card-photo img{display:block;width:100%;height:auto;aspect-ratio:1.39;object-fit:cover;border-radius:7px;background:#eae5d9}
+.map-card-photo figcaption{margin-top:5px;font:400 8px/1.6 var(--sans);color:#839075}
+.map-card-src{font-family:var(--sans);color:#7b8b6b}
+.map-card-step button{width:28px;height:28px;border-color:#d2dcc7;border-radius:6px;color:#61764f;background:#fafcf6}
+.map-card-step button:hover{border-color:#b5c4a6;background:#e8f0df;color:#37532a}
+
+/* 年份介绍旁的情景图。图片沿用站内素材，不作为历史现场照片。 */
+.era:not([hidden]){display:grid;grid-template-columns:minmax(0,1fr) minmax(150px,.42fr);align-items:start;gap:24px}
+.era-photo{position:sticky;top:114px;min-width:0;margin:0}
+.era-photo img{display:block;width:100%;height:auto;aspect-ratio:4/5;object-fit:cover;border-radius:10px;background:#e5e0d6}
+.era-photo figcaption{padding-top:11px;color:#6f765f;font:400 10px/1.7 var(--sans)}
+.era-photo figcaption b{display:block;font-weight:500;color:#544b3d}.era-photo figcaption span{display:block;margin-top:4px;font-size:8px;color:#918a77}
+@media(max-width:1100px){
+ .era:not([hidden]){grid-template-columns:1fr;gap:22px}.era-photo{position:static;grid-row:1}
+ .era-photo img{aspect-ratio:2.6;max-height:190px}.era-photo figcaption{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:8px}
+ .era-photo figcaption span{margin-top:0;text-align:right}
+}
+@media(max-width:520px){
+ .map-readout{left:13px;top:13px;width:173px;padding:10px 12px}.map-readout strong{font-size:21px}
+ .map-card{padding:12px 13px 11px}.map-card h3{font-size:15px}
+ .map-card.has-photo .map-card-body{grid-template-columns:minmax(0,1fr) 90px;gap:10px}.map-card-copy{font-size:10.5px;line-height:1.8}
+ .map-card-photo figcaption{font-size:7px}.map-card-meta{font-size:8px}
+ .era-photo img{aspect-ratio:16/9;max-height:none}.era-photo figcaption{font-size:10px}.era-photo figcaption span{font-size:8px}
+}

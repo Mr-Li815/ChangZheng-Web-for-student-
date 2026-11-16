@@ -152,7 +152,7 @@ ROUTES[3].events=[
  event([109.66,37.08],'永坪镇','先期到达陕北','1935.09.15','红二十五军抵达延川永坪镇，随后与陕甘红军会师，为迎接主力红军创造条件。','yongping')
 ];
 ROUTES[3].pts=[[114.43,31.92],[113.7,32.3],[113.11,33.25],[112.5,33.7],[111.05,34.05],[110.38,33.70],[109.3,34.0],[108.8,34.0],[107.4,34.2],[106.30,33.91],[105.7,34.58],[105.67,34.86],[106.13,35.62],[106.28,35.63],[106.65,35.54],[107.26,35.33],[107.7,35.68],[108.2,36.1],[108.8,36.7],[109.66,37.08]];
-var palette=['#f16c50','#79bade','#bbcda1','#e0b76f'];
+var palette=['#b43f32','#326f90','#477456','#906826'];
 ROUTES.forEach(function(rt,i){rt.color=palette[i];rt.remember=0;rt.progress=0;});
 var defs=mk('defs',{});svg.appendChild(defs);
 var base=mk('g',{});svg.appendChild(base);
@@ -163,7 +163,8 @@ for(var gy=20;gy<=54;gy+=2.5)grid.appendChild(mk('line',{x1:0,y1:n(Y(gy)),x2:W,y
 var OUT=window.CHINA_OUT||[];
 if(OUT.length)add(mk('path',{d:rings(OUT),'class':'outfill'}));
 var gp=add(mk('g',{'class':'provs'}));
-(window.CHINA_GEO||[]).forEach(function(prov){gp.appendChild(mk('path',{d:rings(prov[1]),'class':'prov'}));});
+var landTints=['#fbfaf5','#f1f3e9','#f7f3e9','#edf2e9'];
+(window.CHINA_GEO||[]).forEach(function(prov,i){gp.appendChild(mk('path',{d:rings(prov[1]),'class':'prov',style:'--province-fill:'+landTints[i%landTints.length]}));});
 if(OUT.length)add(mk('path',{d:rings(OUT),'class':'border'}));
 var islands=add(mk('g',{'class':'isles'}));
 (window.CHINA_ISL||[]).forEach(function(c){if(c[1]>B0)islands.appendChild(mk('circle',{cx:n(X(c[0])),cy:n(Y(c[1])),r:.7}));});
@@ -178,7 +179,8 @@ ROUTES.forEach(function(rt,armyIndex){
  var pathData=curve(rt.pts),ghost=mk('path',{d:pathData,'class':'route route-ghost',stroke:rt.color,'stroke-width':1.5});routeLayer.appendChild(ghost);rt.ghost=ghost;
  var mask=mk('mask',{id:'reveal-'+rt.id,maskUnits:'userSpaceOnUse',x:0,y:0,width:W,height:H});
  var maskPath=mk('path',{d:pathData,fill:'none',stroke:'#fff','stroke-width':25,'stroke-linecap':'round'});mask.appendChild(maskPath);defs.appendChild(mask);rt.maskPath=maskPath;
- var el=mk('path',{d:pathData,'class':'route',stroke:rt.color,'stroke-width':3,mask:'url(#reveal-'+rt.id+')'});if(rt.dash)el.setAttribute('stroke-dasharray',rt.dash);routeLayer.appendChild(el);rt.el=el;rt.len=el.getTotalLength();
+ var casing=mk('path',{d:pathData,'class':'route route-casing',stroke:'#fffdf8','stroke-width':7,mask:'url(#reveal-'+rt.id+')'});routeLayer.appendChild(casing);rt.casing=casing;
+ var el=mk('path',{d:pathData,'class':'route',stroke:rt.color,'stroke-width':3.7,mask:'url(#reveal-'+rt.id+')'});if(rt.dash)el.setAttribute('stroke-dasharray',rt.dash);routeLayer.appendChild(el);rt.el=el;rt.len=el.getTotalLength();
  maskPath.style.strokeDasharray=String(rt.len);maskPath.style.strokeDashoffset='0';
  var group=mk('g',{'class':'ways','data-army':rt.id});nodeLayer.appendChild(group);rt.group=group;
  var samples=[];for(var k=0;k<=1200;k++)samples.push(el.getPointAtLength(rt.len*k/1200));
@@ -213,6 +215,23 @@ var runner=add(mk('circle',{'class':'runner',r:3.5,visibility:'hidden'}));
 var runnerRing=add(mk('circle',{'class':'runner-ring',r:9,visibility:'hidden'}));
 /* 事件卡片：贴在地图节点旁边，点击节点才出现 */
 var card=$('map-card'),cardOpen=false;
+/* 使用站内对应情景图；没有合适配图的节点只显示原有史料。 */
+var eventPhotos={
+ '于都':['n01','夜渡于都河'], '湘江':['n02','湘江战役'], '黎平':['n03','黎平会议'],
+ '遵义':['n04','遵义会议'], '土城·赤水':['n05','四渡赤水'], '皎平渡':['n06','渡过金沙江'],
+ '泸定桥':['n07','泸定桥'], '夹金山':['n08','雪山行军'], '草地':['n09','穿越草地'],
+ '腊子口':['n10','突破腊子口'], '吴起镇':['n11','到达陕北'], '会宁':['n12','会宁会师'],
+ '石鼓':['n06','渡过金沙江'], '松潘草地':['n09','穿越草地']
+};
+function showEventPhoto(point){
+ var photo=eventPhotos[point.n],figure=$('mc-photo'),image=$('mc-image');
+ figure.hidden=!photo;card.classList.toggle('has-photo',!!photo);
+ if(!photo){image.removeAttribute('src');image.alt='';return;}
+ image.alt=photo[1]+' · 情景配图';$('mc-caption').textContent=photo[1]+' · 情景配图';
+ var source=window.ASSET+'img/'+photo[0]+'.jpg';if(image.getAttribute('src')!==source)image.src=source;
+}
+$('mc-image').addEventListener('load',function(){cardPlace();});
+$('mc-image').addEventListener('error',function(){$('mc-photo').hidden=true;card.classList.remove('has-photo');cardPlace();});
 function cardPlace(){
  if(!cardOpen||eventIndex<0)return;
  var rt=ROUTES[active],pt=rt.events[eventIndex];if(!pt||!pt.q)return;
@@ -236,6 +255,7 @@ function showEvent(index,animate,stayClosed){
  var rt=ROUTES[active];eventIndex=(index+rt.events.length)%rt.events.length;rt.remember=eventIndex;var pt=rt.events[eventIndex];
  $('mc-index').textContent=String(eventIndex+1).padStart(2,'0')+' / '+String(rt.events.length).padStart(2,'0');
  $('mc-date').textContent=pt.dt;$('mc-title').textContent=pt.t;$('mc-copy').textContent=pt.x;
+ showEventPhoto(pt);
  var src=$('mc-source');src.textContent='资料来源：'+pt.source[0]+' ↗';src.href=pt.source[1];
  $('map-current-place').textContent=pt.n;
  rt.events.forEach(function(p,j){p.el.classList.toggle('on',j===eventIndex);p.el.setAttribute('aria-pressed',String(j===eventIndex));});
@@ -249,7 +269,7 @@ function updateProgress(){var p=ROUTES[active].progress;$('route-progress').valu
 function selectArmy(index){
  stopPlayback();active=index;eventIndex=-1;var rt=ROUTES[index];
  rt.progress=0;rt.elapsed=0;rt.remember=0;$('atlas').style.setProperty('--route-color',rt.color);svg.style.setProperty('--route-color',rt.color);card.style.setProperty('--route-color',rt.color);
- ROUTES.forEach(function(r,i){var selected=i===index;r.ghost.style.opacity=selected?'.2':'.07';r.el.style.opacity=selected?'1':'0';r.el.classList.toggle('route-active',selected);r.group.style.display=selected?'':'none';r.events.forEach(function(pt){pt.el.tabIndex=selected?0:-1;});r.btn.classList.toggle('on',selected);r.btn.setAttribute('aria-pressed',String(selected));});
+ ROUTES.forEach(function(r,i){var selected=i===index;r.ghost.style.opacity=selected?'.3':'.14';r.casing.style.opacity=selected?'1':'0';r.el.style.opacity=selected?'1':'0';r.el.classList.toggle('route-active',selected);r.group.style.display=selected?'':'none';r.events.forEach(function(pt){pt.el.tabIndex=selected?0:-1;});r.btn.classList.toggle('on',selected);r.btn.setAttribute('aria-pressed',String(selected));});
  $('map-route-name').textContent=rt.n;$('map-route-period').textContent=rt.sub;$('playback-state').textContent='待出发 · '+rt.events.length+' 个主要节点';
  showEvent(0,true,true);updateProgress();resetView();setPlayButton();
  if(!reduce&&rt.maskPath.animate){rt.maskPath.style.strokeDashoffset='0';revealAnimation=rt.maskPath.animate([{strokeDashoffset:String(rt.len)},{strokeDashoffset:'0'}],{duration:3600,easing:'cubic-bezier(.32,.06,.28,1)'});}
