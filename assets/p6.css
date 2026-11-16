@@ -275,3 +275,10 @@ color:#cfd6c2;font:12px/1 Arial;cursor:pointer}
  .map-card-photo figcaption{font-size:7px}.map-card-meta{font-size:8px}
  .era-photo img{aspect-ratio:16/9;max-height:none}.era-photo figcaption{font-size:10px}.era-photo figcaption span{font-size:8px}
 }
+
+/* 固定为黑色指针，避免系统的白色光标在浅色地图上消失。 */
+.p6 .mapbox,.p6 .map-card{cursor:url("./cursors/map-arrow.svg") 4 2,default}
+.p6 #map{cursor:url("./cursors/map-crosshair.svg") 16 16,crosshair}
+.p6 .mapbox.is-zoomed #map{cursor:url("./cursors/map-grab.svg") 16 16,grab}
+.p6 .mapbox.dragging #map{cursor:url("./cursors/map-grabbing.svg") 16 16,grabbing}
+.p6 .wp,.p6 .map-tools button,.p6 .map-card button,.p6 .map-card a{cursor:url("./cursors/map-pointer.svg") 13 4,pointer}
