@@ -26,7 +26,7 @@ nav.innerHTML='<div class="march-bar">'+mesh()+
  '<div class="march-index"><ol class="march-stops">'+PAGES.map(function(p,i){
    return '<li><a class="march-stop" href="'+pgHref(p[0],i)+'"'+(i===cur?' aria-current="page"':'')+'><span class="march-stop-number">'+String(i).padStart(2,'0')+'</span><b>'+p[1]+'</b></a></li>';
  }).join('')+'</ol><span class="march-liquid" aria-hidden="true"></span></div>'+
- '<button class="xz march-assistant" type="button" aria-label="打开小征讲解员" aria-haspopup="dialog" aria-controls="xzp" aria-expanded="false"><span aria-hidden="true">✦</span><b>小征</b></button>'+
+ '<button class="xz march-assistant" type="button" aria-label="打开小征 AI 问答" title="小征 · AI 问答" aria-haspopup="dialog" aria-controls="xzp" aria-expanded="false"><span class="xz-launch-orb" aria-hidden="true">✦</span><b>小征</b><small class="xz-ai-tag">AI</small></button>'+
  '<span class="march-trail" aria-hidden="true">'+PAGES.map(function(p,i){return '<i'+(i===cur?' class="here"':(i<cur?' class="passed"':''))+'></i>';}).join('')+'</span></div>';
 body.insertBefore(nav,d.getElementById('main'));
 var indexBox=nav.querySelector('.march-index'),liquid=nav.querySelector('.march-liquid');

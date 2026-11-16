@@ -13,20 +13,22 @@ var reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
 var p=d.createElement('aside');
 p.className='xzp';p.id='xzp';
 p.setAttribute('role','dialog');
-p.setAttribute('aria-label','小征');
+p.setAttribute('aria-labelledby','xztitle');
+var SPARK='<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m12 2 2.7 7.3L22 12l-7.3 2.7L12 22l-2.7-7.3L2 12l7.3-2.7L12 2Z" fill="currentColor"/></svg>';
 p.innerHTML=
  '<div class="xzp__sky" aria-hidden="true"><i class="a"></i><i class="b"></i><i class="c"></i></div>'+
  '<header class="xzp__h">'+
-   '<span class="xzp__orbwrap"><canvas class="xzp__orb" aria-hidden="true"></canvas></span>'+
-   '<div class="xzp__id"><b>小征</b><small>长征路上的青年讲解员</small></div>'+
+   '<span class="xzp__orbwrap"><canvas class="xzp__orb" aria-hidden="true"></canvas><span class="xzp__orb-tag">AI</span></span>'+
+   '<div class="xzp__id"><span class="xzp__eyebrow">AI COMPANION</span><b id="xztitle">小征<em>智能讲解员</em></b><small>让每一个疑问，都有回声。</small></div>'+
    '<span class="xzp__state" id="xzstate" aria-label="离线模式"></span>'+
    '<button class="xzp__x" type="button" aria-label="关闭">✕</button>'+
  '</header>'+
  '<div class="xzp__rail" aria-hidden="true"><span>于都</span><i class="rail-line"><b id="xzrail"></b></i><span>会宁</span></div>'+
  '<div class="xzp__b" id="xzb" aria-live="polite"></div>'+
  '<form class="xzp__f" id="xzf">'+
-   '<input id="xzq" autocomplete="off" maxlength="1200" placeholder="问一句话，我讲一段路…" aria-label="你的问题">'+
-   '<button type="submit"><span>传令</span><i aria-hidden="true">→</i></button>'+
+   '<span class="xzp__input-spark" aria-hidden="true">'+SPARK+'</span>'+
+   '<input id="xzq" autocomplete="off" maxlength="1200" placeholder="向 AI 提问，聊聊你想知道的…" aria-label="向小征 AI 提问">'+
+   '<button type="submit" aria-label="发送问题"><span>发送</span><i aria-hidden="true">↑</i></button>'+
  '</form>'+
  '<p class="xzp__m" id="xzm">离线模式 · 仅站内资料</p>';
 d.body.appendChild(p);
@@ -34,10 +36,15 @@ d.body.appendChild(p);
 var body=p.querySelector('#xzb'),form=p.querySelector('#xzf'),input=p.querySelector('#xzq'),
     mode=p.querySelector('#xzm'),state=p.querySelector('#xzstate'),rail=p.querySelector('#xzrail'),
     sky=p.querySelector('.xzp__sky'),btn=d.querySelector('.nav .xz'),opened=0,busy=0,msgCount=0;
+var send=form.querySelector('button');
 
 function setMode(){
-  if(online&&!apiDead){mode.textContent='在线模式 · AI 问答';mode.className='xzp__m live';state.classList.add('live');state.setAttribute('aria-label','在线模式');}
-  else{mode.textContent='离线模式 · 仅站内资料';mode.className='xzp__m';state.classList.remove('live');state.setAttribute('aria-label','离线模式');}
+  var live=online&&!apiDead;
+  p.classList.toggle('is-thinking',!!busy);
+  form.setAttribute('aria-busy',String(!!busy));
+  send.disabled=!!busy;
+  if(live){mode.textContent=busy?'AI 正在生成回答…':'AI 在线 · 长征讲解与学习问答';mode.className='xzp__m live';state.classList.add('live');state.setAttribute('aria-label',busy?'AI 正在生成回答':'AI 在线');}
+  else{mode.textContent='站内资料模式 · 随时可以提问';mode.className='xzp__m';state.classList.remove('live');state.setAttribute('aria-label','站内资料模式');}
 }
 setMode();
 
@@ -130,12 +137,13 @@ function open(){
   if(btn)btn.setAttribute('aria-expanded','true');
   if(orb)orb.start();
   if(!opened){opened=1;window.setTimeout(hello,reduce?0:260);}
-  window.setTimeout(function(){input.focus();},reduce?0:420);
+  window.setTimeout(function(){if(p.classList.contains('on'))input.focus();},reduce?0:420);
 }
 function close(){
   p.classList.remove('on');
   if(btn)btn.setAttribute('aria-expanded','false');
   if(orb)orb.stop();
+  if(btn)btn.focus();
 }
 if(btn)btn.addEventListener('click',function(e){e.preventDefault();p.classList.contains('on')?close():open();});
 p.querySelector('.xzp__x').addEventListener('click',close);
@@ -174,7 +182,12 @@ function say(cls,txt,extra){
   var el=d.createElement('div');
   el.className='xzr '+cls;
   el.style.setProperty('--i',String(Math.min(body.querySelectorAll('.xzr').length,8)));
-  el.innerHTML=cls==='a'?'<em>★</em><span>'+esc(txt)+'</span>':esc(txt);
+  if(cls==='a'){
+    var thinking=txt==='…';
+    if(thinking)el.classList.add('is-waiting');
+    el.innerHTML='<span class="xzr__meta">'+SPARK+'<b>小征</b><i>AI</i></span>'+
+      (thinking?'<span class="xz-thinking" role="status"><span class="xz-thinking__wave" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span>正在组织回答</span></span>':'<span class="xzr__content">'+esc(txt)+'</span>');
+  }else el.textContent=txt;
   body.appendChild(el);
   if(extra){var s=d.createElement('div');s.className='xzr src';s.textContent=extra;body.appendChild(s);}
   bump();scrollEnd();
@@ -184,7 +197,7 @@ function say(cls,txt,extra){
 /* ---------- 开场 ---------- */
 var PRESETS=['这条路到底有多长？','钟赤兵是谁？','你能聊点别的吗？'];
 function hello(){
-  say('a','你好，我是小征。关于这条路，你可以问我——');
+  say('a','你好，我是小征，你的 AI 讲解员。关于长征，或其他学习问题，都可以问我。');
   var box=d.createElement('div');box.className='xzchips';
   PRESETS.forEach(function(q,i){
     var b=d.createElement('button');b.type='button';b.textContent=q;
@@ -223,21 +236,22 @@ function ask(q){
       wait.remove();
       say('a',ans);
       if(hit.length)say('src','〔'+uniqSrc(hit).join('　')+'〕');
-      busy=0;
+      busy=0;setMode();
     }).catch(function(error){
       apiDead=1;setMode();
       wait.remove();
       var r=local(q,hit);say('a',r.text);
       if(r.src)say('src','〔'+r.src+'〕');
       say('note',error.status===429?'提问有些频繁，请一分钟后再试。以上来自站内资料。':'在线服务暂时不可用。以上来自站内资料，下次提问会重新尝试联网。');
-      busy=0;
+      busy=0;setMode();
     });
   }else{
+    setMode();
     setTimeout(function(){
       wait.remove();
       var r=local(q,hit);say('a',r.text);
       if(r.src)say('src','〔'+r.src+'〕');
-      busy=0;
+      busy=0;setMode();
     },340);
   }
 }
