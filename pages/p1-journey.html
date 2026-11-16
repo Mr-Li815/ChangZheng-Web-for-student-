@@ -21,7 +21,7 @@
   <section class="wall stat-staircase journey-scene" data-journey-scene="numbers" aria-labelledby="stats-title">
     <canvas class="shader-field" aria-hidden="true"></canvas>
     <canvas class="geometry-field" aria-hidden="true"></canvas>
-    <header class="stair-meta"><h2 id="stats-title">每一个数字，都有重量。</h2><span>四个数字 / 一段远征</span><button type="button" class="journey-motion-toggle" aria-pressed="false"><i aria-hidden="true">Ⅱ</i><span>暂停动效</span></button></header>
+    <header class="stair-meta"><div><span class="journey-section-label">01 / 征途的重量</span><h2 id="stats-title">每一个数字，都有重量。</h2></div><button type="button" class="journey-motion-toggle" aria-pressed="false"><i aria-hidden="true">Ⅱ</i><span>暂停动效</span></button></header>
     <div class="stair-steps">
       <article class="w stat-step" style="--step:0;--depth:7"><div class="stat-plane"><span class="stat-index">01 / 出发</span><div class="stat-copy"><p class="big" aria-label="8.6 万"><span data-fluid-value="8.6" data-d="1">8.6</span><sup>万</sup></p><p class="lab">出发<small>从于都，踏上征途。</small></p></div></div></article>
       <article class="w stat-step" style="--step:1;--depth:11"><div class="stat-plane"><span class="stat-index">02 / 日夜</span><div class="stat-copy"><p class="big" aria-label="373 天"><span data-fluid-value="373">373</span><sup>天</sup></p><p class="lab">中央红军<small>把漫长，走成抵达。</small></p></div></div></article>
@@ -32,14 +32,14 @@
   </section>
   <p class="note">翻越 20 多座大山，渡过 20 多条河流，重要战役战斗 380 多次，占领 60 多座城镇。</p>
 
-  <section class="track">
+  <section class="track" aria-labelledby="route-title">
+    <header class="track-intro"><div><span class="journey-section-label">02 / 山河之间</span><h2 id="route-title">沿着十二个坐标，<br>走进长征。</h2></div><p>从出发到会师，<br>把一段远征，读成十二次停留。</p></header>
     <div class="map">
-      <div class="route-scene journey-scene" data-journey-scene="route">
-      <canvas class="shader-field" aria-hidden="true"></canvas><canvas class="geometry-field" aria-hidden="true"></canvas>
-      <div class="route-scene-head"><span>山河之间 / 路线示意</span><b class="route-scene-current">于都</b></div>
+      <div class="route-scene">
+      <div class="route-scene-head"><span>长征路线示意 <small>SCHEMATIC ROUTE</small></span><b class="route-scene-current">于都</b></div>
       <div class="route-camera">
       <svg id="map" viewBox="0 0 600 520" aria-hidden="true">
-        <defs><linearGradient id="journeyRouteInk" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#ad3028"/><stop offset=".5" stop-color="#d18b3c"/><stop offset="1" stop-color="#9a302a"/></linearGradient><radialGradient id="gl"><stop offset="0" stop-color="#D98A3D" stop-opacity=".55"/><stop offset="1" stop-color="#D98A3D" stop-opacity="0"/></radialGradient></defs>
+        <defs><linearGradient id="journeyRouteInk" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#ad3028"/><stop offset=".5" stop-color="#bb7049"/><stop offset="1" stop-color="#9a302a"/></linearGradient><radialGradient id="gl"><stop offset="0" stop-color="#D98A3D" stop-opacity=".18"/><stop offset="1" stop-color="#D98A3D" stop-opacity="0"/></radialGradient></defs>
         <g class="ct">
           <path d="M-20 120C80 90 160 150 260 110S440 60 620 110"/>
           <path d="M-20 200C90 170 190 240 300 190S470 140 620 200"/>
@@ -47,23 +47,14 @@
           <path d="M-20 410C110 380 200 440 330 400S520 360 620 420"/>
         </g>
         <path class="base"/><path class="line"/><g class="pts"></g>
-        <g class="walker"><circle r="26" fill="url(#gl)"/><rect x="-2.5" y="-2.5" width="5" height="5"/></g>
+        <g class="walker"><circle r="11" fill="url(#gl)"/><rect x="-2.5" y="-2.5" width="5" height="5"/></g>
       </svg>
-      </div><span class="route-scene-footer">12 个坐标 · 向前，直到天亮 <i aria-hidden="true">＋</i></span>
+      </div><span class="route-scene-footer"><span>于都 <i aria-hidden="true">→</i> 会宁</span><span class="route-scene-count">01 / 12</span></span>
       </div>
     </div>
     <div id="cards"></div>
   </section>
 
-  <aside class="ov" id="ov" aria-label="总路线鸟瞰">
-    <svg viewBox="0 0 600 520" aria-hidden="true">
-      <path class="ov__base"/>
-      <path class="ov__line"/>
-      <g class="ov__pts"></g>
-      <circle class="ov__dot" r="5"/>
-    </svg>
-    <p>总路线 · 12 站</p>
-  </aside>
 </main>
 <script src="../assets/app.js"></script>
 <script src="../assets/config.js"></script>

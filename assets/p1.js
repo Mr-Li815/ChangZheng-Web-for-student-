@@ -23,7 +23,7 @@ function pad(n){return ('0'+n).slice(-2);}
 d.getElementById('cards').innerHTML=S.map(function(s,i){
   return '<article class="c"><div class="c__in">'+
   '<figure class="fig"><span class="fig__ph"><b>'+s[0]+'</b>'+s[1]+'<i>配图待补</i></span>'+
-  '<img src="'+window.ASSET+'img/n'+pad(i+1)+'.jpg" alt="'+s[0]+' · '+s[1]+'" loading="lazy" onerror="this.remove()"></figure>'+
+  '<img src="'+window.ASSET+'img/n'+pad(i+1)+'.jpg" alt="'+s[0]+' · '+s[1]+'" loading="lazy" onerror="this.remove()"><figcaption class="station-count" aria-label="第 '+(i+1)+' 站，共 12 站"><b>'+pad(i+1)+'</b><span>/ 12</span></figcaption></figure>'+
   '<span class="d">'+s[1]+'</span><h2>'+s[0]+'</h2><p class="l">'+s[4]+'</p><p class="v">'+s[5]+'</p>'+
   (O[s[6]]?'<a class="obj" href="p3-objects.html#o'+O[s[6]]+'"><i>物件</i>'+s[6]+'</a>':'')+
   (i===4?'<p class="age">那年，钟赤兵 21 岁。</p>':'')+'<small>〔'+s[7]+'〕</small></div></article>';}).join('');
@@ -44,25 +44,11 @@ line.style.strokeDasharray=L;line.style.strokeDashoffset=L;
 var pts=P.map(function(p,i){var e=d.createElementNS(NS,'g'),r=p[0]<300;
   e.setAttribute('class','pt');e.setAttribute('transform','translate('+p[0]+' '+p[1]+')');
   e.style.setProperty('--dl',(-i*0.43).toFixed(2)+'s');
-  e.innerHTML='<circle class="hl" r="21"/><circle class="spark" r="2.1"/><circle class="rg" r="9"/><rect x="-3" y="-3" width="6" height="6"/><text x="'+(r?12:-12)+'" y="5" text-anchor="'+(r?'start':'end')+'">'+S[i][0]+'</text>';
+  e.innerHTML='<circle class="rg" r="8"/><rect x="-3" y="-3" width="6" height="6"/><text x="'+(r?12:-12)+'" y="5" text-anchor="'+(r?'start':'end')+'">'+S[i][0]+'</text>';
   g.appendChild(e);return e;});
 
-/* 总路线鸟瞰缩略图：同一份路径，缩到 180px */
-var ov=d.getElementById('ov'),ovBase=ov.querySelector('.ov__base'),ovLine=ov.querySelector('.ov__line'),
-  ovPts=ov.querySelector('.ov__pts'),ovDot=ov.querySelector('.ov__dot'),ovL=0,ovMini=[];
-ovBase.setAttribute('d',full);ovLine.setAttribute('d',full);
-ovL=ovLine.getTotalLength();
-ovLine.style.strokeDasharray=ovL;ovLine.style.strokeDashoffset=ovL;
-P.forEach(function(p){var c=d.createElementNS(NS,'circle');c.setAttribute('cx',p[0]);c.setAttribute('cy',p[1]);c.setAttribute('r',2.2);ovPts.appendChild(c);ovMini.push(c);});
-/* 按路线实际范围收紧鸟瞰图视野 */
-try{
-  var bb=ovLine.getBBox(),px=Math.max(14,bb.width*.09),py=Math.max(14,bb.height*.09);
-  ov.querySelector('svg').setAttribute('viewBox',
-    (bb.x-px)+' '+(bb.y-py)+' '+(bb.width+px*2)+' '+(bb.height+py*2));
-}catch(e){}
-
 /* 滚动 → p（0–1）：视口中线落在相邻两张卡的中心之间时，在两站里程比例间插值；每帧只写一次 */
-var cards=[].slice.call(d.querySelectorAll('.c')),mid=[],vh=0,busy=0,cur=-1,on=[];
+var cards=[].slice.call(d.querySelectorAll('#cards .c')),mid=[],vh=0,busy=0,cur=-1,on=[];
 function measure(){vh=innerHeight;mid=cards.map(function(c){var r=c.getBoundingClientRect();return r.top+scrollY+r.height/2;});}
 function frame(){
   busy=0;var y=scrollY+vh*.5,i=0,p,k,u,q;
@@ -70,28 +56,16 @@ function frame(){
   else{while(mid[i+1]<y)i++;u=(y-mid[i])/(mid[i+1]-mid[i]);p=F[i]+(F[i+1]-F[i])*u;i+=u>.5?1:0;}
   line.style.strokeDashoffset=L*(1-p);
   q=line.getPointAtLength(L*p);w.setAttribute('transform','translate('+q.x+' '+q.y+')');
-  ct.style.transform='translateY('+(-p*36)+'px)';
-  if(ovL){
-    ovLine.style.strokeDashoffset=ovL*(1-p);
-    var m=ovLine.getPointAtLength(ovL*p);
-    ovDot.setAttribute('cx',m.x);ovDot.setAttribute('cy',m.y);
-  }
-  for(k=0;k<12;k++){var t=y>=mid[k]-1;if(on[k]!==t){on[k]=t;pts[k].classList.toggle('lit',t);if(ovMini[k])ovMini[k].classList.toggle('lit',t);}}
+  ct.style.transform=reduce?'none':'translateY('+(-p*6)+'px)';
+  for(k=0;k<12;k++){var t=y>=mid[k]-1;if(on[k]!==t){on[k]=t;pts[k].classList.toggle('lit',t);}}
   if(i!==cur){if(cur>=0){cards[cur].classList.remove('cur');pts[cur].classList.remove('cur');}
-    cur=i;cards[i].classList.add('cur');pts[i].classList.add('cur');}
+    cur=i;cards[i].classList.add('cur');pts[i].classList.add('cur');
+    var current=d.querySelector('.route-scene-current'),counter=d.querySelector('.route-scene-count');
+    if(current)current.textContent=S[i][0];if(counter)counter.textContent=pad(i+1)+' / 12';}
 }
 function sync(){measure();frame();}
 addEventListener('scroll',function(){if(!busy){busy=1;requestAnimationFrame(frame);}},{passive:true});
 addEventListener('resize',sync);addEventListener('load',sync);sync();
-
-/* 进入路线区才显示鸟瞰图 */
-var track=d.querySelector('.track');
-if(track&&ov){
-  var ioT=new IntersectionObserver(function(es){
-    es.forEach(function(e){ov.classList.toggle('on',e.isIntersecting);});
-  },{rootMargin:'-10% 0px -10% 0px'});
-  ioT.observe(track);
-}
 
 /* 数字墙：进入视口 0 → 目标值，800ms easeOutExpo */
 function count(n){var T=+n.dataset.n,dec=+n.dataset.d||0,t0=0;
