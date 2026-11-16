@@ -1,6 +1,13 @@
-.git/
+.git
 .github/
 .wrangler/
 node_modules/
+worker/
+functions/
+tests/
+.dev.vars*
+.env*
+.gitignore
+README*
 wrangler.json
 .assetsignore

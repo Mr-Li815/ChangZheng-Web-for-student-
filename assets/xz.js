@@ -1,12 +1,12 @@
 /* 小征 · 星火舱（3D 光球 + 视差 + 错峰入场 + 滚动吸附）
-   本地检索优先，外接 API 可选；无 key 或断网自动降级 */
+   在线请求只走本站接口；断网时使用站内资料 */
 (function(){
 'use strict';
 var d=document,cfg=window.XZ||{};
 function KB(){return window.XZKB||[];}
-var key=(cfg.key||'').trim();
 var apiDead=0;
-var ep=(cfg.proxy||'').trim()||cfg.endpoint;
+var ep=(cfg.proxy||'').trim();
+var online=!!ep&&/^https?:$/.test(window.location.protocol);
 var reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 /* ---------- 面板骨架 ---------- */
@@ -25,7 +25,7 @@ p.innerHTML=
  '<div class="xzp__rail" aria-hidden="true"><span>于都</span><i class="rail-line"><b id="xzrail"></b></i><span>会宁</span></div>'+
  '<div class="xzp__b" id="xzb" aria-live="polite"></div>'+
  '<form class="xzp__f" id="xzf">'+
-   '<input id="xzq" autocomplete="off" placeholder="问一句话，我讲一段路…" aria-label="你的问题">'+
+   '<input id="xzq" autocomplete="off" maxlength="1200" placeholder="问一句话，我讲一段路…" aria-label="你的问题">'+
    '<button type="submit"><span>传令</span><i aria-hidden="true">→</i></button>'+
  '</form>'+
  '<p class="xzp__m" id="xzm">离线模式 · 仅站内资料</p>';
@@ -36,7 +36,7 @@ var body=p.querySelector('#xzb'),form=p.querySelector('#xzf'),input=p.querySelec
     sky=p.querySelector('.xzp__sky'),btn=d.querySelector('.nav .xz'),opened=0,busy=0,msgCount=0;
 
 function setMode(){
-  if(key){mode.textContent='在线模式 · 完整对话';mode.className='xzp__m live';state.classList.add('live');state.setAttribute('aria-label','在线模式');}
+  if(online&&!apiDead){mode.textContent='在线模式 · AI 问答';mode.className='xzp__m live';state.classList.add('live');state.setAttribute('aria-label','在线模式');}
   else{mode.textContent='离线模式 · 仅站内资料';mode.className='xzp__m';state.classList.remove('live');state.setAttribute('aria-label','离线模式');}
 }
 setMode();
@@ -217,18 +217,19 @@ function ask(q){
   input.value='';
   var hit=top(q,3);
   var wait=say('a','…');
-  if(key&&!apiDead){
+  if(online){
+    apiDead=0;setMode();
     api(q,hit).then(function(ans){
       wait.remove();
       say('a',ans);
       if(hit.length)say('src','〔'+uniqSrc(hit).join('　')+'〕');
       busy=0;
-    }).catch(function(){
-      apiDead=1;
+    }).catch(function(error){
+      apiDead=1;setMode();
       wait.remove();
       var r=local(q,hit);say('a',r.text);
       if(r.src)say('src','〔'+r.src+'〕');
-      say('note','网络没有接通。以上来自站内资料。');
+      say('note',error.status===429?'提问有些频繁，请一分钟后再试。以上来自站内资料。':'在线服务暂时不可用。以上来自站内资料，下次提问会重新尝试联网。');
       busy=0;
     });
   }else{
@@ -244,74 +245,28 @@ function uniqSrc(list){
   var o=[];list.forEach(function(e){if(o.indexOf(e.s)<0)o.push(e.s);});return o;
 }
 function local(q,hit){
-  if(!hit.length)return {text:'离线的时候我只能答站内的资料，这个问题不行。联网之后可以随便问。',src:''};
+  if(!hit.length)return {text:'目前只能查询站内资料，这个问题暂时没有找到答案。可以稍后再问一次。',src:''};
   var e=hit[0];
   return {text:e.a,src:e.s};
 }
 
-/* ---------- 外接 API ---------- */
-var SYS=[
-'你是「小征」，一个网站里的 AI 讲解员，也是普通的大模型助手。',
-'观众是十五到二十岁的学生，你和他们同龄。',
-'',
-'【说话方式】',
-'短句。一句不超过 30 字。不用感叹号。不说教，不煽情。',
-'不出现这些词：我们要、应当、伟大、铭记、传承、可歌可泣、让我们、共同。',
-'回答控制在 150 字以内。能一句话说清就别写两句。',
-'',
-'【你所在的网站】',
-'《夜行 · 以我青春，续写长征华章》，九个页面：',
-'1 序章 · 火柴：1934 年 10 月，8.6 万人从江西于都出发',
-'2 一 · 里程：12 个节点——于都、湘江、通道·黎平、遵义、赤水·娄山关、金沙江、大渡河·泸定桥、夹金山、川西北草地、腊子口、吴起镇、会宁',
-'3 二 · 面孔：填你的年龄，对照一个同龄的人；六张档案卡——钟赤兵、陈树湘、徐解秀、刘伯承、无名者、文学里的红军',
-'4 三 · 物件：门板、担架、电报稿、马灯、绑腿、草鞋、行军锅、半条被子',
-'5 四 · 数字：每 14 人只有 1 人到达陕北；373 天；日均约 70 里；中央红军与全体红军两套口径',
-'6 五 · 跟上：12 幕角色扮演，41 个选项，5 种结局',
-'7 六 · 精神：五个方面，最后会反问你一句',
-'8 七 · 接力：三组并置、留言墙、八道数字快答',
-'9 尾 · 火柴',
-'',
-'【站内定下的数字，必须原样使用，不许改写或换算】',
-'8.6 万余人出发；湘江后锐减至 3 万余人；历时 373 天；日均约 70 里；最远行程二万五千里；',
-'翻越 20 多座大山，渡过 20 多条河流，重要战役战斗 380 多次，占领 60 多座城镇；',
-'遵义会议 1935 年 1 月 15 日至 17 日；陈树湘 29 岁，1934 年 12 月 18 日；钟赤兵娄山关失去右腿；',
-'半条被子：三名女战士、湖南汝城沙洲村、徐解秀。',
-'',
-'【怎么回答】',
-'问网站上有的，用上面的内容和数字答，并且可以顺手指一句去哪一页看。',
-'问别的事情，正常回答。不要拒绝，不要生硬地拉回长征，也不要说“站里没有收录”。',
-'只有当你确实不知道、或者涉及没有定论的具体细节时，才说不知道。',
-'不描述人物外貌，不评价历史人物，不渲染死亡细节。',
-'',
-'直接输出中文回答，不要加标题，不要用 JSON，不要写“小征：”这样的前缀。'
-].join('\n');
-
+/* ---------- 本站在线问答接口 ---------- */
 function api(q,hit){
-  var ctx=hit.length?hit.map(function(e,i){return (i+1)+'. '+e.a;}).join('\n'):'（这一条没有检索到站内资料，按常识回答即可）';
-  var ctl=new AbortController(),tm=setTimeout(function(){ctl.abort();},cfg.timeout||9000);
+  var ctx=hit.map(function(e,i){return (i+1)+'. '+e.a;}).join('\n');
+  var ctl=new AbortController(),tm=setTimeout(function(){ctl.abort();},cfg.timeout||40000);
   return fetch(ep,{
     method:'POST',
-    headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
-    body:JSON.stringify({
-      model:cfg.model||'deepseek-chat',
-      temperature:cfg.temperature==null?0.5:cfg.temperature,
-      max_tokens:cfg.maxTokens||420,
-      stream:false,
-      messages:[
-        {role:'system',content:SYS+'\n\n【站内相关资料，仅供参考，不要照抄】\n'+ctx},
-        {role:'user',content:q}
-      ]
-    }),
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({question:q,context:ctx}),
     signal:ctl.signal
   }).then(function(r){
-    clearTimeout(tm);
-    if(!r.ok)throw new Error('http '+r.status);
+    if(!r.ok){var error=new Error('http '+r.status);error.status=r.status;throw error;}
     return r.json();
   }).then(function(j){
     var txt=j&&j.choices&&j.choices[0]&&j.choices[0].message&&j.choices[0].message.content;
-    if(!txt)throw new Error('empty');
-    return String(txt).trim().slice(0,600);
-  });
+    if(typeof txt!=='string'||!txt.trim())throw new Error('empty');
+    return txt.trim().slice(0,600);
+  }).finally(function(){clearTimeout(tm);});
 }
 
 /* ---------- 绑定 ---------- */
