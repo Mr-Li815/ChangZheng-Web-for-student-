@@ -216,7 +216,7 @@ function run(p){
 
 $('again').addEventListener('click',function(){cont();});
 $('restart').addEventListener('click',function(){
-  out.hidden=true;sto.hidden=true;acts.hidden=true;els=[];stoB.innerHTML='';$('art').hidden=true;
+  out.hidden=true;sto.hidden=true;acts.hidden=true;els=[];stoB.innerHTML='';
   f.classList.remove('done');window.scrollTo({top:0,behavior:reduce?'auto':'smooth'});
   setTimeout(function(){f.elements.o.focus({preventScroll:true});},reduce?0:400);
 });

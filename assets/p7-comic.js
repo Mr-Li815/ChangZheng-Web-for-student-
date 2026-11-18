@@ -26,13 +26,9 @@ panels=[].slice.call(d.querySelectorAll('#s1,#s2,#s3,#s4,#s5,#s6,#s7'));
   var box=d.getElementById('plates');if(!box)return;
   var named=[['廖大珠','二连连长'],['王海云','二连指导员'],['李友林','战士'],['刘金山','战士'],
     ['刘梓华','战士'],['赵长发','战士'],['杨田铭','战士'],['云贵川','战士']];
-  var h='',i;
-  for(i=0;i<22;i++){
-    var n=named[i];
-    h+=n?'<div class="plate"><b>'+n[0]+'</b><i>'+n[1]+'</i></div>'
-        :'<div class="plate plate--blank"><b>？</b><i>姓名未留下</i></div>';
-  }
-  box.innerHTML=h;
+  box.innerHTML=named.map(function(person){
+    return '<div class="plate"><b>'+person[0]+'</b><i>'+person[1]+'</i></div>';
+  }).join('');
 })();
 
 /* ---------- 逐格揭示：入镜即开演（运镜由 CSS .seen 动画承担） ---------- */
@@ -176,7 +172,7 @@ d.addEventListener('click',function(e){
 });
 
 /* ---------- 胶片进度条 ---------- */
-var bar=null,btns=[],setProg=function(){};
+var bar=null,btns=[],playBtn,fill;
 (function(){
   if(panels.length<2)return;
   var names=['电令','夜行','对岸','铁索','勇士','夺桥','过桥'];
@@ -188,82 +184,80 @@ var bar=null,btns=[],setProg=function(){};
     }).join('');
   d.body.appendChild(bar);
   btns=[].slice.call(bar.querySelectorAll('button[data-i]'));
-  var fill=bar.querySelector('.p7bar__p i');
-  setProg=function(p){fill.style.transform='scaleX('+(p>0?p.toFixed(3):0)+')';};
-
+  fill=bar.querySelector('.p7bar__p i');
   btns.forEach(function(b){b.addEventListener('click',function(){
-    userAct();
-    panels[+b.dataset.i].scrollIntoView({behavior:reduce?'auto':'smooth',block:'start'});
-    setTimeout(function(){pos=scrollY;},700);
+    stopShow();
+    cutTo(panels[+b.dataset.i]);
   });});
   var busy=0,bp=-1;
   function prog(){
     busy=0;var y=scrollY+innerHeight*.45;bp=-1;
     panels.forEach(function(p,i){if(p.offsetTop<=y)bp=i;});
-    btns.forEach(function(b,i){b.classList.toggle('on',i===bp);});
+    btns.forEach(function(b,i){b.classList.toggle('on',i===bp);if(i===bp)b.setAttribute('aria-current','step');else b.removeAttribute('aria-current');});
   }
   addEventListener('scroll',function(){if(!busy){busy=1;requestAnimationFrame(prog);}},{passive:true});
   prog();
 })();
 
-/* ---------- 自动放映：连续滑行，不翻页 ---------- */
-var SPEED=64,               /* 每秒 64px —— 一格 100dvh 约走 12 秒 */
-    IDLE=12000,
-    autoOn=!reduce&&shots.length>1,
-    paused=false,
-    pos=0,lastT=0,idleT=0,maxY=1;
+/* 每幅先停留供阅读，再用短叠化切到下一幅。手动滚动仍是连续长卷。 */
+var playing=!reduce,frame=0,elapsed=0,lastTime=0,transition=null;
+var dwell=[5200,10000,11000,11500,9000,15000,9000,10500,6000];
+playBtn=bar.querySelector('.p7bar__play');
 
-var playBtn=bar?bar.querySelector('.p7bar__play'):null,
-    reel=bar?bar.querySelector('.p7bar__p i'):null;
-
-function markPlay(){
-  if(!playBtn)return;
-  var on=autoOn&&!paused;
-  playBtn.textContent=on?'❚❚':'▶';
-  playBtn.setAttribute('aria-label',on?'暂停自动放映':'继续自动放映');
-  bar.classList.toggle('off',!on);
-}
-function setReel(p){if(reel)reel.style.transform='scaleX('+(p>0?Math.min(1,p).toFixed(4):0)+')';}
-
-function tick(t){
-  requestAnimationFrame(tick);
-  if(!lastT){lastT=t;return;}
-  var dt=Math.min(.08,(t-lastT)/1000);lastT=t;
-  if(!autoOn||paused||d.hidden)return;
-  maxY=d.documentElement.scrollHeight-innerHeight;
-  pos+=SPEED*dt;
-  if(pos>=maxY){pos=maxY;scrollTo(0,pos);setReel(1);autoOn=false;markPlay();return;}
-  scrollTo(0,pos);
-  setReel(pos/maxY);
-}
-
-function userAct(){
-  pos=scrollY;
-  if(!autoOn)return;
-  paused=true;markPlay();
-  clearTimeout(idleT);
-  idleT=setTimeout(function(){paused=false;lastT=0;pos=scrollY;markPlay();},IDLE);
-}
-addEventListener('wheel',userAct,{passive:true});
-addEventListener('touchstart',userAct,{passive:true});
-addEventListener('scroll',function(){if(paused||!autoOn)pos=scrollY;},{passive:true});
-addEventListener('keydown',function(e){
-  if(e.key===' '){e.preventDefault();
-    if(autoOn&&!paused){paused=true;clearTimeout(idleT);}
-    else{autoOn=true;paused=false;clearTimeout(idleT);lastT=0;pos=scrollY;}
-    markPlay();return;
+function cutTo(shot){
+  function show(){
+    shot.classList.add('seen');
+    shot.scrollIntoView({behavior:'instant',block:'start'});
   }
-  userAct();
+  if(transition)transition.skipTransition();
+  if(reduce||lite||!d.startViewTransition){show();return;}
+  root.classList.add('reel-cut');
+  var cut=d.startViewTransition(show);
+  transition=cut;
+  cut.finished.finally(function(){
+    if(transition===cut){transition=null;root.classList.remove('reel-cut');}
+  });
+}
+function markPlay(){
+  playBtn.textContent=playing?'Ⅱ':'▶';
+  playBtn.setAttribute('aria-label',playing?'暂停自动放映':'开始自动放映');
+  bar.classList.toggle('off',!playing);
+}
+function stopShow(){
+  playing=false;cancelAnimationFrame(frame);frame=0;elapsed=0;lastTime=0;
+  fill.style.transform='scaleX(0)';markPlay();
+}
+function tick(now){
+  if(!playing)return;
+  if(!d.hidden && lastTime)elapsed+=Math.min(now-lastTime,120);
+  lastTime=now;
+  var i=curIdx(),fraction=elapsed/dwell[i];
+  fill.style.transform='scaleX('+Math.min(1,fraction)+')';
+  if(fraction>=1){
+    if(i===shots.length-1){stopShow();return;}
+    elapsed=0;cutTo(shots[i+1]);
+  }
+  frame=requestAnimationFrame(tick);
+}
+function toggleShow(){
+  if(playing){stopShow();return;}
+  if(curIdx()===shots.length-1)cutTo(shots[0]);
+  playing=true;lastTime=0;markPlay();frame=requestAnimationFrame(tick);
+}
+playBtn.addEventListener('click',toggleShow);
+addEventListener('wheel',stopShow,{passive:true});
+addEventListener('touchmove',stopShow,{passive:true});
+d.addEventListener('keydown',function(e){
+  if(e.defaultPrevented||e.altKey||e.metaKey||e.ctrlKey||e.target.closest('input,textarea,select,[contenteditable=true],.march-nav,.xz-panel'))return;
+  if(e.key==='ArrowLeft'||e.key==='ArrowRight'){
+    e.preventDefault();stopShow();
+    cutTo(shots[Math.max(0,Math.min(shots.length-1,curIdx()+(e.key==='ArrowRight'?1:-1)))]);
+  }else if(e.key===' '&&!e.target.closest('a,button')){
+    e.preventDefault();toggleShow();
+  }else if(['ArrowDown','ArrowUp','PageDown','PageUp','Home','End'].includes(e.key))stopShow();
 });
-if(playBtn)playBtn.addEventListener('click',function(){
-  if(autoOn&&!paused){paused=true;clearTimeout(idleT);}
-  else{autoOn=true;paused=false;clearTimeout(idleT);lastT=0;pos=scrollY;}
-  markPlay();
-});
-
-pos=scrollY;maxY=d.documentElement.scrollHeight-innerHeight;
 markPlay();
-requestAnimationFrame(tick);
+if(playing)frame=requestAnimationFrame(tick);
 
 /* ---------- 小征：读到最后现身 ---------- */
 (function(){

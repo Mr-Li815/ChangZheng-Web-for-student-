@@ -9,15 +9,19 @@
 <link rel="stylesheet" href="../assets/p5hub.css">
 <link rel="stylesheet" href="../assets/story.css">
 <link rel="stylesheet" href="../assets/xz.css">
+<link rel="stylesheet" href="../assets/experience.css">
 </head>
-<body class="page" data-i="5">
+<body class="page game-page game-art" data-i="5">
 <a class="skip-link" href="#main">跳到正文</a>
-<main id="main" class="act artgen">
+<main id="main" class="game-layout">
+  <header class="game-cover">
+    <img class="game-image" src="../assets/img/n08.jpg" alt="">
+    <div class="game-heading"><p>沿途造像</p><h1>你走过的地方</h1></div>
+  </header>
+  <div class="game-content act artgen">
   <a class="back" href="p5-follow.html">← 同行</a>
-  <p class="cap">造像</p>
-  <h1>画一张</h1>
-  <p class="lead">选一个地方。AI 决定画面，本站画出来。</p>
-  <p class="off" id="off" hidden>没有接 API。以下是离线版，基础功能都能用。</p>
+  <p class="lead">选一个地方。写下你想看见的画面，留一幅沿途速写。</p>
+  <p class="off" id="off" hidden>离线模式 · 使用本站素材创作。</p>
 
   <form id="af" class="sf" autocomplete="off" novalidate>
     <div class="sf__in">
@@ -33,7 +37,7 @@
         <label><input type="radio" name="p" value="吴起镇"><span>吴起镇</span></label>
       </fieldset>
       <p class="ln ln--o"><label for="an">画什么</label><textarea id="an" rows="2" maxlength="80" placeholder="不填也行。比如：夜里过河，只有一盏马灯"></textarea></p>
-      <button class="go" type="submit"><span>画</span><i aria-hidden="true">→</i></button>
+      <button class="go" type="submit"><span>绘制造像</span><i aria-hidden="true">→</i></button>
       <p class="err" id="err" role="alert"></p>
     </div>
   </form>
@@ -54,6 +58,7 @@
       <a class="btn" href="p5-follow.html">返回同行</a>
     </div>
   </section>
+  </div>
 </main>
 <script src="../assets/app.js"></script>
 <script src="../assets/config.js"></script>

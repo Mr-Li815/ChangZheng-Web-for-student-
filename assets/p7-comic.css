@@ -423,3 +423,55 @@ html.lite .p7 .shot::before,
 html.lite .p7 .shot::after{display:none}
 
 html.lite .p7 .vignette,html.lite .p7 .fireglow{mix-blend-mode:normal}
+
+/* Dissolve at a cut; keep the artwork still long enough to read the caption. */
+html.reel-cut::view-transition-old(root){animation:reel-out .38s ease-out both}
+html.reel-cut::view-transition-new(root){animation:reel-in .44s ease-in-out both}
+@keyframes reel-out{to{opacity:0}}
+@keyframes reel-in{from{opacity:0}}
+.p7 .cover-art{opacity:1;background:linear-gradient(90deg,#1d1916dd,transparent 90%),url(img/n07.jpg) center/cover}
+.p7 .cover h1,.p7 .cover .sub,.p7 .cover .roll,.p7 .cover .cap{color:#fff1da}
+.p7 .cover h1::after{display:none}.p7 .cover .sub{max-width:28em;line-height:1.9}
+.p7 .cover .roll i{background:#ead6b6}
+.p7 .cover .cap{font-size:13px}
+.p7 .nbx,.p7 .bub,.p7 .bub::after,.p7 .plate,.p7 .stamp{border:0}
+.p7 .nbx{background:#f5ecdbf5;backdrop-filter:none}.p7 .nbx small{color:#6c6051}
+.p7 .plate{background:#e8dac0}.p7 .plate--blank{background:#e8dac09c}
+.p7 .plate--blank b,.p7 .plate--blank i{color:#403b34}
+.p7bar{border:0;padding:6px 8px 9px;background:#29261ff5}
+.p7bar::before,.p7bar::after{display:none}
+.p7bar button{color:#e9dfd0;min-height:35px}
+.p7bar button.on{background:#edc58f}
+.p7 .shot--quake.seen{animation:none}
+.p7 .flash,.p7 .burst{display:none}
+.js .p7 .shot.seen .sfx{animation:ink-sound .4s ease-out .15s both}
+@keyframes ink-sound{from{opacity:0;transform:rotate(-10deg) scale(.94)}to{opacity:1;transform:rotate(-8deg) scale(1)}}
+.js .p7 .shot.seen .hud :is(.nbx,.stamp,.plates){transition-delay:.12s}
+.js .p7 .shot.seen .hud .bub.b2{transition-delay:.32s}
+.js .p7 .shot.seen .hud .bub.b3{transition-delay:.5s}
+@media(min-width:1100px){
+ .p7 .hud .tag{left:calc(var(--rail-w) + 3vw)}
+}
+@media(max-width:760px){
+ .p7bar{width:min(96vw,410px);transform:translateX(-50%);justify-content:center}
+ .p7bar button{margin:0;min-width:0;flex:1;width:auto;height:38px}
+ .p7 .hud .tag{top:118px}
+ .p7 .cover{padding:0 7vw}
+}
+@media(prefers-reduced-motion:reduce){
+ .p7bar{display:flex}
+ .js .p7 .shot.seen .sfx{animation:none}
+}
+
+/* Eight recorded names share one caption strip beneath the chain of 22 lights. */
+#s5 .hud .plates{grid-template-columns:repeat(8,minmax(0,1fr));bottom:160px;background:#eadfcbed;gap:0;padding:10px}
+#s5 .hud .plate{background:none}
+#s5 .hud .plate-note{bottom:128px;color:#f7ecda;font:400 12px/1.5 var(--sans);letter-spacing:0}
+@media(max-width:760px){
+ #s5 .hud .plates{grid-template-columns:repeat(4,1fr);bottom:155px}
+ #s5 .hud .nbx{bottom:255px}
+ #s5 .hud .plate-note{right:5vw;bottom:115px}
+}
+@media(min-width:1100px){
+ .p7 .hud .nbx,#s5 .hud .plates,#s5 .hud .plate-note{left:calc(var(--rail-w) + 3vw)}
+}
