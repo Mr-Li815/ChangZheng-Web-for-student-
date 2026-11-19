@@ -29,61 +29,36 @@
     if (activeCards.size) frameId = requestAnimationFrame(tick);
   }
 
-  function illustration(kind, seed) {
+  // Sample the same woodcut paths that are visible with JavaScript turned off.
+  // All marks stay in the print's viewBox until they are mapped to the card.
+  function illustration(print, seed) {
     const marks = [];
+    const sample = print.createSVGPoint();
     function random() {
       seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
       return seed / 4294967296;
     }
-    function grain(x, y, alpha, size = 1.32) {
-      marks.push({ x, y, alpha: alpha * (.43 + random() * .57), size: size * (.6 + random() * .85) });
+    function fleck(x, y, light, size) {
+      marks.push({ x, y, light, size, alpha: .22 + random() * .39 });
     }
-    function ribbon(path, width, density, alpha) {
-      for (let i = 1; i < path.length; i++) {
-        const [x, y] = path[i - 1];
-        const [endX, endY] = path[i];
-        const steps = Math.ceil(Math.hypot(endX - x, endY - y) * density);
-        for (let step = 0; step < steps; step++) {
-          const t = (step + random()) / steps;
-          grain(x + (endX - x) * t + (random() - .5) * width,
-            y + (endY - y) * t + (random() - .5) * width, alpha);
-        }
-      }
-    }
-    for (let i = 0; i < 210; i++) grain(random(), random(), .26, .8);
 
-    if (kind === 'route') {
-      const trail = [[.03,.78],[.23,.6],[.36,.67],[.57,.46]];
-      ribbon(trail, .11, 250, .94);
-      ribbon([[.57,.46],[.68,.29],[.8,.25],[.97,.07]], .10, 190, .93);
-      ribbon([[.57,.46],[.73,.52],[.81,.45],[1,.42]], .10, 190, .82);
-      ribbon([[.57,.46],[.66,.67],[.81,.71],[.95,.59]], .09, 170, .70);
-      ribbon([[.04,.87],[.23,.7],[.36,.76],[.49,.67]], .047, 120, .64);
-    } else if (kind === 'quiz') {
-      for (let i = 0; i < 8; i++) {
-        const x = .15 + (i % 4) * .23;
-        const y = .30 + Math.floor(i / 4) * .37;
-        const radius = .064 + i * .003;
-        for (let p = 0; p < 58; p++) {
-          const angle = random() * Math.PI * 2;
-          const range = Math.sqrt(random()) * radius;
-          grain(x + Math.cos(angle) * range, y + Math.sin(angle) * range * 1.38, .96, 1.58);
+    for (const path of print.querySelectorAll('path[data-grain]')) {
+      const length = path.getTotalLength();
+      for (let s = random() * 2; s < length; s += 1.5 + random() * 1.8) {
+        const edge = path.getPointAtLength(s);
+        fleck(edge.x + (random() - .5) * 4, edge.y + (random() - .5) * 4,
+          random() < .64, .35 + random() * .80);
+      }
+      if (!path.isPointInFill || getComputedStyle(path).fill === 'none') continue;
+      const box = path.getBBox();
+      const attempts = Math.ceil(box.width * box.height / 12);
+      for (let i = 0; i < attempts; i++) {
+        sample.x = box.x + random() * box.width;
+        sample.y = box.y + random() * box.height;
+        if (path.isPointInFill(sample)) {
+          fleck(sample.x, sample.y, random() < .22, .36 + random() * .78);
         }
       }
-    } else if (kind === 'letter') {
-      const corners = [[.12,.31],[.83,.13],[.98,.65],[.27,.82]];
-      ribbon([...corners,corners[0]], .057, 166, .89);
-      ribbon([corners[0],[.58,.53],corners[1]], .055, 184, .97);
-      ribbon([corners[3],[.44,.47]], .046, 142, .65);
-      ribbon([corners[2],[.71,.42]], .046, 142, .65);
-      ribbon([[.34,.77],[.84,.64]], .15, 140, .4);
-    } else {
-      const ridge = [[0,.73],[.19,.60],[.34,.37],[.46,.5],[.66,.17],[.89,.45],[1,.54]];
-      for (let layer = 0; layer < 5; layer++) {
-        ribbon(ridge.map(([x,y]) => [x, y * (1 - layer * .09) + layer * .095]),
-          .06 + layer * .012, 172 - layer * 14, .97 - layer * .12);
-      }
-      ribbon([[.43,.51],[.57,.41],[.64,.48],[.77,.36]], .07, 140, .73);
     }
     return marks;
   }
@@ -94,10 +69,14 @@
     const context = canvas.getContext('2d');
     if (!context) return;
 
-    const marks = illustration(link.dataset.grain, 127 + index * 977);
+    const print = art.querySelector('svg');
+    const marks = illustration(print, 127 + index * 977);
     const color = getComputedStyle(link).getPropertyValue('--grain').trim();
     let width = 0;
     let height = 0;
+    let printX = 0;
+    let printY = 0;
+    let scale = 1;
     let burst = null;
 
     const card = {
@@ -105,18 +84,12 @@
       draw(time) {
         if (!width || !height) return;
         context.clearRect(0, 0, width, height);
-        context.fillStyle = color;
-        const compact = width < 460;
-        const artWidth = width * (compact ? .60 : .54);
-        const artHeight = height * (compact ? .62 : .80);
-        const startX = width - artWidth - width * .025;
-        const startY = height * (compact ? .115 : .085);
-        const radius = compact ? 66 : 90;
+        const radius = width < 460 ? 66 : 90;
         const burstAge = burst ? (time - burst.time) / 480 : 1;
 
         for (const mark of marks) {
-          let x = startX + mark.x * artWidth;
-          let y = startY + mark.y * artHeight;
+          let x = printX + mark.x * scale;
+          let y = printY + mark.y * scale;
           let highlight = 0;
           if (card.heat > .005) {
             const dx = x - card.x;
@@ -128,12 +101,15 @@
             y += dy * spread;
             highlight = strength * .34;
           }
+          context.fillStyle = mark.light ? color : '#241e20';
           context.globalAlpha = Math.min(1, mark.alpha + highlight);
-          context.fillRect(x, y, mark.size, mark.size);
+          const size = Math.max(.65, mark.size * scale);
+          context.fillRect(x, y, size * 1.28, size);
         }
 
         if (burstAge < 1) {
           const travel = 1 - (1 - Math.max(0, burstAge)) ** 3;
+          context.fillStyle = color;
           context.globalAlpha = .88 * (1 - burstAge);
           for (let i = 0; i < 26; i++) {
             const angle = i * 2.39996;
@@ -151,11 +127,16 @@
       width = canvas.clientWidth;
       height = canvas.clientHeight;
       if (!width || !height) return;
+      // The print and the overlay share an offset parent (including on narrow cards).
+      const bounds = print.getBoundingClientRect();
+      const overlay = canvas.getBoundingClientRect();
+      printX = bounds.left - overlay.left;
+      printY = bounds.top - overlay.top;
+      scale = bounds.width / print.viewBox.baseVal.width;
       canvas.width = Math.round(width * ratio);
       canvas.height = Math.round(height * ratio);
       context.setTransform(ratio, 0, 0, ratio, 0, 0);
       card.draw(performance.now());
-      art.classList.add('is-drawn');
     }
 
     function followPointer(event) {
