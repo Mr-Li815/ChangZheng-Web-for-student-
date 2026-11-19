@@ -195,11 +195,14 @@ function say(cls,txt,extra){
 }
 
 /* ---------- 开场 ---------- */
-var PRESETS=['这条路到底有多长？','钟赤兵是谁？','你能聊点别的吗？'];
+var PRESETS=['长征为什么开始？','哪四支队伍参加了长征？','长征途中吃什么？'];
 function hello(){
   say('a','你好，我是小征，你的 AI 讲解员。关于长征，或其他学习问题，都可以问我。');
+  suggest(PRESETS);
+}
+function suggest(questions){
   var box=d.createElement('div');box.className='xzchips';
-  PRESETS.forEach(function(q,i){
+  questions.forEach(function(q,i){
     var b=d.createElement('button');b.type='button';b.textContent=q;
     b.style.setProperty('--i',String(i));
     b.addEventListener('click',function(){ask(q);});
@@ -210,16 +213,34 @@ function hello(){
 }
 
 /* ---------- 检索 ---------- */
-function score(e,q){
-  var n=0;
-  (e.k||[]).forEach(function(k){if(q.indexOf(k)>=0)n+=k.length>2?2:1;});
-  return n;
+function normalize(text){
+  return text.normalize('NFKC').toLowerCase().replace(/[\s\p{P}\p{S}]/gu,'').replace(/为啥|咋会/g,'为什么');
 }
-function top(q,n){
-  return KB().map(function(e,i){return {e:e,s:score(e,q)};})
-    .filter(function(x){return x.s>0;})
-    .sort(function(a,b){return b.s-a.s;})
-    .slice(0,n).map(function(x){return x.e;});
+var genericTerms=new Set(['是什么','出发','1934','1935','1936','战争','战斗','留下','剪','牺牲','名字','多少人','多少座','22']);
+var broadTerms=new Set(['从哪里出发','从哪儿出发','出发地','长征从哪','多远','多少里','几天','多少天','到陕北','到达陕北','战役','会师']);
+var entries=KB().map(function(entry){
+  var terms=Array.from(new Set((entry.k||[]).concat(entry.q||[]).map(normalize))).filter(function(term){
+    return term.length>=2&&!genericTerms.has(term);
+  }).sort(function(a,b){return b.length-a.length;});
+  return {entry:entry,terms:terms};
+});
+function top(question,limit){
+  var query=normalize(question);
+  var matches=entries.flatMap(function(record){
+    var term=record.terms.find(function(candidate){
+      if(query.indexOf(candidate)<0)return false;
+      // 单独问“长征”时给概览，其他主题需要独立证据，避免误答成概览。
+      return candidate!=='长征'||/^(请|能否|可以)?(介绍一下|介绍|讲讲|说说|什么是)?(红军)?长征(是什么|历史|概况|吗)?$/.test(query);
+    });
+    if(!term)return [];
+    var specificity=(broadTerms.has(term)?5:term.length*5)+(query===term?12:0)+(record.entry.q?7:0);
+    return [{entry:record.entry,score:specificity}];
+  }).sort(function(a,b){return b.score-a.score;});
+  var seen=new Set();
+  return matches.map(function(match){return match.entry;}).filter(function(entry){
+    if(seen.has(entry.a))return false;
+    seen.add(entry.a);return true;
+  }).slice(0,limit);
 }
 
 /* ---------- 问 ---------- */
@@ -228,29 +249,27 @@ function ask(q){
   busy=1;
   say('u',q);
   input.value='';
-  var hit=top(q,3);
+  var hit=top(q,5);
   var wait=say('a','…');
   if(online){
     apiDead=0;setMode();
     api(q,hit).then(function(ans){
       wait.remove();
       say('a',ans);
-      if(hit.length)say('src','〔'+uniqSrc(hit).join('　')+'〕');
+      if(hit.length)say('src','站内参考 · '+uniqSrc(hit).slice(0,3).join(' / '));
       busy=0;setMode();
     }).catch(function(error){
       apiDead=1;setMode();
       wait.remove();
-      var r=local(q,hit);say('a',r.text);
-      if(r.src)say('src','〔'+r.src+'〕');
-      say('note',error.status===429?'提问有些频繁，请一分钟后再试。以上来自站内资料。':'在线服务暂时不可用。以上来自站内资料，下次提问会重新尝试联网。');
+      local(hit);
+      say('note',error.status===429?'在线问答请求较多，请稍后再试。':'在线问答暂时连不上，下次提问会重新连接。');
       busy=0;setMode();
     });
   }else{
     setMode();
     setTimeout(function(){
       wait.remove();
-      var r=local(q,hit);say('a',r.text);
-      if(r.src)say('src','〔'+r.src+'〕');
+      local(hit);
       busy=0;setMode();
     },340);
   }
@@ -258,15 +277,25 @@ function ask(q){
 function uniqSrc(list){
   var o=[];list.forEach(function(e){if(o.indexOf(e.s)<0)o.push(e.s);});return o;
 }
-function local(q,hit){
-  if(!hit.length)return {text:'目前只能查询站内资料，这个问题暂时没有找到答案。可以稍后再问一次。',src:''};
-  var e=hit[0];
-  return {text:e.a,src:e.s};
+function local(hit){
+  if(!hit.length){
+    say('a','你想了解哪个地点、人物或事件？可以只输入一个名字，比如“遵义”或“红25军”。');
+    suggest(['四支红军分别从哪里出发？','彝海结盟发生了什么？','为什么草地那么难走？']);
+    return;
+  }
+  var entry=hit[0];
+  say('a',entry.a);
+  var reference=say('src','资料来源 · ');
+  if(entry.u){
+    var link=d.createElement('a');
+    link.href=entry.u;link.target='_blank';link.rel='noopener noreferrer';link.textContent=entry.s+' ↗';
+    reference.appendChild(link);
+  }else reference.append(entry.s);
 }
 
 /* ---------- 本站在线问答接口 ---------- */
 function api(q,hit){
-  var ctx=hit.map(function(e,i){return (i+1)+'. '+e.a;}).join('\n');
+  var ctx=hit.map(function(e,i){return (i+1)+'. '+(e.q?e.q+'：':'')+e.a+'（来源：'+e.s+'）';}).join('\n');
   var ctl=new AbortController(),tm=setTimeout(function(){ctl.abort();},cfg.timeout||40000);
   return fetch(ep,{
     method:'POST',
