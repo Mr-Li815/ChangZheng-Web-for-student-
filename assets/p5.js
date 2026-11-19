@@ -114,15 +114,8 @@ var PRO={
 z:['你十七岁。','于都人。家里还有一个妹妹。','','你不知道要走多久。'],
 d:['你二十四岁。','你带十一个人。','','他们看着你。']};
 
-var sceneImages=['n01','n01','n02','n02','n04','o3','n06','n08','n09','n09','n10','n12'];
-function coverScene(number){
-  var cover=d.querySelector('.game-cover');
-  cover.querySelector('img').src='../assets/img/'+sceneImages[number-1]+'.jpg';
-  cover.querySelector('p').textContent='第 '+number+' 幕 ／ 共 12 幕';
-}
 function start(){
   S=fresh();var sv=load();if(sv){S=sv;hud();scene();return;}
-  d.querySelector('.game-cover img').src='../assets/img/n01.jpg';
   d.querySelector('.game-heading p').textContent='角色体验';
   put(lines(['@1934 年 10 月　江西 于都'],0).h+
     '<p style="--d:.1s">你叫什么名字？</p><input id="nm" value="小伍" maxlength="6" aria-label="名字" style="--d:.12s">'+
@@ -138,7 +131,7 @@ function prologue(){
 }
 function scene(){
   var c=SC[S.scene],a=c[2].split('|'),r,o=ops();
-  coverScene(S.scene);
+  d.querySelector('.game-heading p').textContent='第 '+S.scene+' 幕 ／ 共 12 幕';
   if(S.scene===6 && S.picks.indexOf('yudu-银元')>=0)a.push('','手肘压着衣角，两块银元硌了你一下。你突然很想告诉妹妹：我摸到了。');
   if(S.scene===12 && S.rescued.indexOf('小满')>=0)a.push('','写到小满，笔倒是很快。你还记得他第一次报名字时，特意把那个「满」字说得很响。');
   if(S.scene===1)a.unshift(esc(S.name)+'。'+(S.role==='d'?'二十四岁。':'十七岁。于都人。'),'');

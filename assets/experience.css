@@ -1,13 +1,17 @@
-/* The opening photograph stays beside the activity like the facing page of a book. */
+/* A facing-page print pairs each activity with its entry illustration. */
 .game-page{--paper:#f4efe5;--accent:#953b2d;--dim:#675e53;background:var(--paper)}
 .game-quiz{--paper:#f0e9db;--accent:#75422c}
 .game-story{--paper:#f6efe2;--accent:#834336}
 .game-art{--paper:#edf0e9;--accent:#365953}
 .game-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.12fr);max-width:1680px;min-height:100svh;margin:auto;padding:100px 4vw 84px;gap:clamp(30px,5vw,88px);align-items:start}
-.game-cover{position:sticky;top:100px;isolation:isolate;min-height:360px;height:calc(100svh - 174px);background:#272720;color:#fff9ec;overflow:hidden;display:flex;align-items:flex-end}
-.game-image,.game-cover::after{position:absolute;inset:0;width:100%;height:100%;z-index:-1}
-.game-image{object-fit:cover;filter:sepia(.19)}
-.game-cover::after{content:"";background:linear-gradient(0deg,#161713dc,transparent 58%)}
+.game-cover{
+  position:sticky;top:100px;isolation:isolate;min-height:360px;height:calc(100svh - 174px);
+  display:flex;align-items:flex-end;overflow:hidden;border-radius:14px;color:#fff9ec;
+  background:linear-gradient(154deg,var(--cover-shade),var(--cover) 55%,var(--cover-shade));box-shadow:0 10px 28px -22px #3423196b;
+}
+.game-cover .entry-art{z-index:-1}
+.game-cover .print-plate{left:50%;top:43%;width:min(96%,76vh);transform:translate(-50%,-50%)}
+.game-cover .entry-art::after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,var(--cover-shade),transparent 34%)}
 .game-heading{padding:clamp(20px,3vw,48px)}
 .game-heading p{font:500 13px var(--sans);letter-spacing:.14em}
 .game-heading h1{margin-top:10px;font:700 clamp(38px,4.8vw,78px)/1.12 var(--serif);text-wrap:balance}
@@ -39,3 +43,7 @@
 @media(min-width:1100px){.game-layout{padding-top:32px;padding-left:calc(var(--rail-w) + 3vw + 12px)}.game-cover{top:32px;height:calc(100svh - 118px)}}
 @media(max-width:760px){.game-layout{display:block;padding:122px 20px 80px}.game-cover{position:relative;top:auto;height:clamp(145px,28vh,235px);min-height:0}.game-heading{padding:18px 22px}.game-heading h1{font-size:clamp(30px,7vw,44px)}.game-content:is(.act,.p5){padding-top:18px;max-width:none}.game-content .back{margin-bottom:12px}.game-content .lead{margin-bottom:18px}.game-content .roles.two{grid-template-columns:1fr 1fr;gap:8px}.game-content .role{padding:14px 12px}.game-content .role b{font-size:20px}.game-content .qopt{gap:8px;padding:12px}.game-run .sil{display:none}}
 @media(prefers-reduced-motion:reduce){.game-content #stage *,.game-content .sf__in>*{animation-duration:.01ms!important;animation-delay:0s!important}.game-content #stage{transition:none}}
+@media(max-width:760px){
+  .game-cover .print-plate{left:auto;right:2%;top:42%;width:min(58%,31vh);transform:translateY(-50%)}
+  .game-cover .entry-art::after{background:linear-gradient(90deg,var(--cover-shade),transparent 68%),linear-gradient(0deg,var(--cover-shade),transparent 32%)}
+}

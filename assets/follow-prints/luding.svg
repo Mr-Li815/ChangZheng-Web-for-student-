@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" id="ink" width="240" height="176" viewBox="0 0 240 176" focusable="false">
+  <style>:root:target path:not([data-grain]){visibility:hidden}</style>
+  <!-- 大渡河峡谷：近处铁索向泸定桥的桥门收拢。 -->
+  <path fill="#47665b" d="M0 81 31 77 53 59 70 64 92 42 113 49 138 29 161 36 188 21 216 27 240 9 240 85 0 130Z"/>
+  <path data-grain="" fill="#639080" d="m0 87 42-13 23-9-16 12-27 14Zm46 9 69-44-25 22Zm120-53 47-17-26 16Z"/>
+  <path fill="#293f3a" d="m0 114 57-17 40-22 37-9 55-19 51-5v134H0Z"/>
+  <path data-grain="" fill="#77a391" d="m9 135 74-17-32 12Zm94-22 122-34-61 25ZM66 145l131-36-63 23Zm79-6 90-22-49 17Z"/>
+  <path fill="#c68b66" d="m145 45 44-3-1 4-45 3Zm2 6 7-.4-1 17-6 1Zm31-2 7-.5-.3 17-6 .8Z"/>
+  <path data-grain="" fill="#e1c8a0" d="M139 42q13-2 17-8l7-1 3-6 5 4 8-.5q4 5 15 5l-5 5-44 4Zm9 6 36-3v3l-36 3Z"/>
+  <path fill="#182e2b" d="m148 44 39-3-2 3-36 3Zm7 8 22-2v16l-7 1V56q-3-4-6 1l-1 11-8 1Z"/>
+  <path fill="#33443d" d="M7 157Q75 109 155 66l24-2q-31 54-76 100Z"/>
+  <g fill="none" stroke-linecap="round">
+    <path data-grain="" stroke="#bca27a" stroke-width="1.5" d="M0 156Q71 115 153 66M13 160Q79 116 156 66M27 161Q89 115 159 66M40 162Q98 114 162 66M54 163Q106 115 165 66M66 163Q112 116 168 66M78 164Q121 114 171 66M90 165Q132 113 174 66M104 166Q143 113 177 66"/>
+    <path stroke="#554c3c" stroke-width="2" d="m22 144 93 9m-76-20 83 9m-63-22 74 9m-53-21 62 8m-44-18 50 6m-31-16 39 5m-24-13 30 3m-15-10 20 1"/>
+    <path data-grain="" stroke="#edd7b2" stroke-width="2.2" d="M0 103Q63 100 152 55M0 120Q79 99 153 60M115 155Q156 113 181 53M131 153Q158 110 181 59"/>
+    <path stroke="#c89e75" stroke-width="1.4" d="m23 102 2 22m29-29 1 13m28-23v9m29-22v6m29-17v4m-10 85-8 6m26-30-4 6m16-25-3 4m10-20-1 4"/>
+  </g>
+</svg>
